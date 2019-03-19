@@ -1,0 +1,47 @@
+﻿<Window x:Class="CPS.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:oxy="http://oxyplot.codeplex.com"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="900" Width="1440">
+    <Grid>
+        <ListBox Name="ListOfSignalsAndNoises" HorizontalAlignment="Left" Height="116" Margin="10,68,0,0" VerticalAlignment="Top" Width="438" SelectionChanged="ListOfSignalsAndNoises_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Name}" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Amplituda:" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="85,10,0,0" TextWrapping="Wrap" Text="Czas początkowy:" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="189,10,0,0" TextWrapping="Wrap" Text="Czas trwania sygnału" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="311,10,0,0" TextWrapping="Wrap" Text="Okres podstawowy:" VerticalAlignment="Top" RenderTransformOrigin="-0.262,0.439"/>
+        <TextBlock HorizontalAlignment="Left" Margin="724,10,0,0" TextWrapping="Wrap" Text="Współczynnik wypełnienia:" VerticalAlignment="Top" Width="142"/>
+        <TextBlock HorizontalAlignment="Left" Margin="434,10,0,0" TextWrapping="Wrap" Text="Częstotliwość próbkowania:" VerticalAlignment="Top" Width="159"/>
+        <TextBlock HorizontalAlignment="Left" Margin="598,10,0,0" TextWrapping="Wrap" Text="Liczba przedziałów:" VerticalAlignment="Top" Width="108"/>
+        <TextBlock HorizontalAlignment="Left" Margin="899,10,0,0" TextWrapping="Wrap" Text="Prawdopodobieństwo:" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="Amplitude" HorizontalAlignment="Left" Height="19" Margin="10,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
+        <TextBox Name="StartTime" HorizontalAlignment="Left" Height="19" Margin="85,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
+        <TextBox Name="Duration" HorizontalAlignment="Left" Height="19" Margin="189,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
+        <TextBox Name="BasicPeriod" HorizontalAlignment="Left" Height="19" Margin="311,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
+        <TextBox Name="FillFactor" HorizontalAlignment="Left" Height="19" Margin="724,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="SamplingFrequency" HorizontalAlignment="Left" Height="19" Margin="434,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="NumberOfCompartments" HorizontalAlignment="Left" Height="19" Margin="598,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="Probability" HorizontalAlignment="Left" Height="19" Margin="899,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <Button Name="Generuj" Click="Generate_Click" Content="Generuj pierwszy wykres" HorizontalAlignment="Left" Margin="1070,30,0,0" VerticalAlignment="Top" Width="140"/>
+        <Button Name="Generuj2" Click="Generate2_Click" Content="Generuj drugi wykres" HorizontalAlignment="Left" Margin="1247,30,0,0" VerticalAlignment="Top" Width="140"/>
+        <oxy:Plot x:Name="Plot1" Model="{Binding PlotModel}" Margin="453,68,45,0" VerticalAlignment="Top" Height="200"/>
+        <oxy:Plot x:Name="Plot2" Model="{Binding PlotModel}" Margin="453,298,45,0" VerticalAlignment="Top" Height="200"/>
+        <oxy:Plot x:Name="Plot3" Model="{Binding PlotModel}" Margin="453,611,45,0" VerticalAlignment="Top" Height="200"/>
+        <oxy:Plot x:Name="Histogram1" Model="{Binding HistogramModel}" Margin="10,202,1092,0" VerticalAlignment="Top" Height="319"/>
+        <oxy:Plot x:Name="Histogram2" Model="{Binding HistogramModel}" Margin="10,540,1092,0" VerticalAlignment="Top" Height="319"/>
+    </Grid>
+</Window>
