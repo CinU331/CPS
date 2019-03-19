@@ -20,28 +20,52 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Amplituda:" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="85,10,0,0" TextWrapping="Wrap" Text="Czas początkowy:" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="189,10,0,0" TextWrapping="Wrap" Text="Czas trwania sygnału" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="311,10,0,0" TextWrapping="Wrap" Text="Okres podstawowy:" VerticalAlignment="Top" RenderTransformOrigin="-0.262,0.439"/>
+        <TextBlock HorizontalAlignment="Left" Margin="290,10,0,0" TextWrapping="Wrap" Text="Amplituda:" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="365,10,0,0" TextWrapping="Wrap" Text="Czas początkowy:" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="469,10,0,0" TextWrapping="Wrap" Text="Czas trwania sygnału" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="591,10,0,0" TextWrapping="Wrap" Text="Okres podstawowy:" VerticalAlignment="Top" RenderTransformOrigin="-0.262,0.439"/>
         <TextBlock HorizontalAlignment="Left" Margin="724,10,0,0" TextWrapping="Wrap" Text="Współczynnik wypełnienia:" VerticalAlignment="Top" Width="142"/>
-        <TextBlock HorizontalAlignment="Left" Margin="434,10,0,0" TextWrapping="Wrap" Text="Częstotliwość próbkowania:" VerticalAlignment="Top" Width="159"/>
-        <TextBlock HorizontalAlignment="Left" Margin="598,10,0,0" TextWrapping="Wrap" Text="Liczba przedziałów:" VerticalAlignment="Top" Width="108"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Częstotliwość próbkowania:" VerticalAlignment="Top" Width="159"/>
+        <TextBlock HorizontalAlignment="Left" Margin="174,10,0,0" TextWrapping="Wrap" Text="Liczba przedziałów:" VerticalAlignment="Top" Width="108"/>
         <TextBlock HorizontalAlignment="Left" Margin="899,10,0,0" TextWrapping="Wrap" Text="Prawdopodobieństwo:" VerticalAlignment="Top" Width="120"/>
-        <TextBox Name="Amplitude" HorizontalAlignment="Left" Height="19" Margin="10,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
-        <TextBox Name="StartTime" HorizontalAlignment="Left" Height="19" Margin="85,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
-        <TextBox Name="Duration" HorizontalAlignment="Left" Height="19" Margin="189,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
-        <TextBox Name="BasicPeriod" HorizontalAlignment="Left" Height="19" Margin="311,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
-        <TextBox Name="FillFactor" HorizontalAlignment="Left" Height="19" Margin="724,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
-        <TextBox Name="SamplingFrequency" HorizontalAlignment="Left" Height="19" Margin="434,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
-        <TextBox Name="NumberOfCompartments" HorizontalAlignment="Left" Height="19" Margin="598,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
-        <TextBox Name="Probability" HorizontalAlignment="Left" Height="19" Margin="899,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
-        <Button Name="Generuj" Click="Generate_Click" Content="Generuj pierwszy wykres" HorizontalAlignment="Left" Margin="1070,30,0,0" VerticalAlignment="Top" Width="140"/>
-        <Button Name="Generuj2" Click="Generate2_Click" Content="Generuj drugi wykres" HorizontalAlignment="Left" Margin="1247,30,0,0" VerticalAlignment="Top" Width="140"/>
-        <oxy:Plot x:Name="Plot1" Model="{Binding PlotModel}" Margin="453,68,45,0" VerticalAlignment="Top" Height="200"/>
-        <oxy:Plot x:Name="Plot2" Model="{Binding PlotModel}" Margin="453,298,45,0" VerticalAlignment="Top" Height="200"/>
-        <oxy:Plot x:Name="Plot3" Model="{Binding PlotModel}" Margin="453,611,45,0" VerticalAlignment="Top" Height="200"/>
-        <oxy:Plot x:Name="Histogram1" Model="{Binding HistogramModel}" Margin="10,202,1092,0" VerticalAlignment="Top" Height="319"/>
-        <oxy:Plot x:Name="Histogram2" Model="{Binding HistogramModel}" Margin="10,540,1092,0" VerticalAlignment="Top" Height="319"/>
+        <TextBlock HorizontalAlignment="Left" Margin="488,253,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="665,253,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="169"/>
+        <TextBlock HorizontalAlignment="Left" Margin="899,253,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="1070,253,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="1247,253,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="Amplitude" Text ="10" HorizontalAlignment="Left" Height="19" Margin="290,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
+        <TextBox Name="StartTime" Text ="-10" HorizontalAlignment="Left" Height="19" Margin="365,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
+        <TextBox Name="Duration" Text ="20" HorizontalAlignment="Left" Height="19" Margin="469,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="40"/>
+        <TextBox Name="BasicPeriod" Text ="2" HorizontalAlignment="Left" Height="19" Margin="591,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
+        <TextBox Name="FillFactor" Text ="0,5" HorizontalAlignment="Left" Height="19" Margin="724,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="SamplingFrequency" Text ="1024" HorizontalAlignment="Left" Height="19" Margin="10,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="NumberOfCompartments" Text ="10" HorizontalAlignment="Left" Height="19" Margin="174,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="Probability" Text ="0,5" HorizontalAlignment="Left" Height="19" Margin="899,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="Average" HorizontalAlignment="Left" Height="19" Margin="488,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="AbsoluteMean" HorizontalAlignment="Left" Height="19" Margin="665,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="AveragePower" HorizontalAlignment="Left" Height="19" Margin="899,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="Variance" HorizontalAlignment="Left" Height="19" Margin="1070,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox Name="EffectiveValue" HorizontalAlignment="Left" Height="19" Margin="1247,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <Button Name="Generate" Click="Generate_Click" Content="Generuj pierwszy wykres" HorizontalAlignment="Left" Margin="1070,30,0,0" VerticalAlignment="Top" Width="140"/>
+        <Button Name="Generate2" Click="Generate2_Click" Content="Generuj drugi wykres" HorizontalAlignment="Left" Margin="1247,30,0,0" VerticalAlignment="Top" Width="140"/>
+        <Button Name="Add" Click="Add_Click" Content="Dodaj sygnały" HorizontalAlignment="Left" Margin="526,642,0,0" VerticalAlignment="Top" Width="105"/>
+        <Button Name="Substract" Click="Substract_Click" Content="Odejmij sygnały" HorizontalAlignment="Left" Margin="776,642,0,0" VerticalAlignment="Top" Width="105"/>
+        <Button Name="Multiply" Click="Multiply_Click" Content="Pomnóż sygnały" HorizontalAlignment="Left" Margin="1019,642,0,0" VerticalAlignment="Top" Width="105"/>
+        <Button Name="Divide" Click="Divide_Click" Content="Podziel sygnały" HorizontalAlignment="Left" Margin="1282,642,0,0" VerticalAlignment="Top" Width="105"/>
+        <oxy:Plot x:Name="Plot1" Model="{Binding PlotModel}" Margin="488,68,10,0" VerticalAlignment="Top" Height="180"/>
+        <oxy:Plot x:Name="Plot2" Model="{Binding PlotModel}" Margin="488,338,10,0" VerticalAlignment="Top" Height="180"/>
+        <oxy:Plot x:Name="ResultPlot" Model="{Binding PlotModel}" Margin="488,679,10,0" VerticalAlignment="Top" Height="180"/>
+        <oxy:Plot x:Name="Histogram1" Model="{Binding HistogramModel}" Margin="75,199,1027,0" VerticalAlignment="Top" Height="319"/>
+        <oxy:Plot x:Name="Histogram2" Model="{Binding HistogramModel}" Margin="75,540,1027,0" VerticalAlignment="Top" Height="319"/>
+        <TextBlock HorizontalAlignment="Left" Margin="488,524,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="665,524,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="169"/>
+        <TextBlock HorizontalAlignment="Left" Margin="899,524,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="1070,524,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="1247,524,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Average2" HorizontalAlignment="Left" Height="19" Margin="488,540,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox x:Name="AbsoluteMean2" HorizontalAlignment="Left" Height="19" Margin="665,540,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox x:Name="AveragePower2" HorizontalAlignment="Left" Height="19" Margin="899,540,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox x:Name="Variance2" HorizontalAlignment="Left" Height="19" Margin="1070,540,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+        <TextBox x:Name="EffectiveValue2" HorizontalAlignment="Left" Height="19" Margin="1247,540,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
     </Grid>
 </Window>

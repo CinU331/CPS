@@ -26,12 +26,23 @@ namespace CPS
 
         private OxyPlotModel plot1;
         private OxyPlotModel plot2;
+        private OxyPlotModel resultPlot;
         private Histogram histogram1;
         private Histogram histogram2;
         private LineSeries seriesPoints;
         private ScatterSeries scatterSeries;
-        private List<double> values;
+        private List<KeyValuePair<double, double>> values;
+        private List<KeyValuePair<double, double>> values2;
+        private List<KeyValuePair<double, double>> result;
         private double[] tmpForRand;
+        private bool firstPlotExist;
+        private bool secondPlotExist;
+
+        private double average;
+        private double absoluteMean;
+        private double averagePower;
+        private double variance;
+        private double effectiveValue;
         #endregion
 
         public MainWindow()
@@ -41,11 +52,18 @@ namespace CPS
             Plot1.DataContext = plot1;
             plot2 = new OxyPlotModel();
             Plot2.DataContext = plot2;
+            resultPlot = new OxyPlotModel();
+            ResultPlot.DataContext = resultPlot;
             histogram1 = new Histogram();
             Histogram1.DataContext = histogram1;
             histogram2 = new Histogram();
             Histogram2.DataContext = histogram2;
             AddSignalAndNoisesToListBox();
+
+            Add.IsEnabled = false;
+            Substract.IsEnabled = false;
+            Multiply.IsEnabled = false;
+            Divide.IsEnabled = false;
         }
 
         private void AddSignalAndNoisesToListBox()
@@ -75,6 +93,7 @@ namespace CPS
             Duration.IsEnabled = true;
             BasicPeriod.IsEnabled = false;
             FillFactor.IsEnabled = false;
+            Probability.IsEnabled = false;
         }
 
         private void SecondSetOfParameters()
@@ -84,6 +103,7 @@ namespace CPS
             Duration.IsEnabled = true;
             BasicPeriod.IsEnabled = true;
             FillFactor.IsEnabled = false;
+            Probability.IsEnabled = false;
         }
 
         private void ThirdSetOfParameters()
@@ -93,6 +113,17 @@ namespace CPS
             Duration.IsEnabled = true;
             BasicPeriod.IsEnabled = true;
             FillFactor.IsEnabled = true;
+            Probability.IsEnabled = false;
+        }
+
+        private void FourthSetOfParameters()
+        {
+            Amplitude.IsEnabled = true;
+            StartTime.IsEnabled = true;
+            Duration.IsEnabled = true;
+            BasicPeriod.IsEnabled = false;
+            FillFactor.IsEnabled = false;
+            Probability.IsEnabled = true;
         }
         #endregion
 
@@ -120,11 +151,11 @@ namespace CPS
                         ThirdSetOfParameters();
                         break;
                     case 9:
+                    case 10:
                         FirstSetOfParameters();
                         break;
-                    case 10:
-                        break;
                     case 11:
+                        FourthSetOfParameters();
                         break;
                     default:
                         break;
@@ -169,7 +200,7 @@ namespace CPS
 
         public double Signal6(int n, double k)
         {
-            time = n / samplingFrequency - startTime;
+            time = startTime + (n / samplingFrequency);
             if (time >= ((k * basicPeriod) + startTime) && time < ((fillFactor * basicPeriod) + (k * basicPeriod) + startTime))
                 return amplitude;
             else if (time >= ((fillFactor * basicPeriod) - (k * basicPeriod) + startTime) && time < (basicPeriod + (k * basicPeriod) + startTime))
@@ -179,7 +210,7 @@ namespace CPS
 
         public double Signal7(int n, double k)
         {
-            time = n / samplingFrequency - startTime;
+            time = startTime + (n / samplingFrequency);
             if (time >= ((k * basicPeriod) + startTime) && time < ((fillFactor * basicPeriod) + (k * basicPeriod) + startTime))
                 return amplitude;
             else if (time >= ((fillFactor * basicPeriod) + (k * basicPeriod) + startTime) && time < (basicPeriod + (k * basicPeriod) + startTime))
@@ -189,11 +220,11 @@ namespace CPS
 
         public double Signal8(int n, double k)
         {
-            time = n / samplingFrequency - startTime;
+            time = startTime + (n / samplingFrequency);
             if (time >= ((k * basicPeriod) + startTime) && time < ((fillFactor * basicPeriod) + (k * basicPeriod) + startTime))
                 return amplitude * (time - (k * basicPeriod) - startTime) / (fillFactor * basicPeriod);
             else if (time >= ((fillFactor * basicPeriod) + (k * basicPeriod) + startTime) && time < (basicPeriod + (k * basicPeriod) + startTime))
-                return (-amplitude * (time - (k * basicPeriod) - startTime) / (basicPeriod - (basicPeriod * fillFactor))) + (amplitude/(1 - fillFactor));
+                return (-amplitude * (time - (k * basicPeriod) - startTime) / (basicPeriod - (basicPeriod * fillFactor))) + (amplitude / (1 - fillFactor));
             else return 1;
         }
 
@@ -222,15 +253,6 @@ namespace CPS
         #endregion
         private void SetParameters()
         {
-            amplitude = 10;
-            startTime = -10;
-            duration = 20;
-            samplingFrequency = 1024;
-            numberOfCompartments = 10;
-            fillFactor = 0.5;
-            basicPeriod = 2;
-            probability = 0.5;
-
             if (Amplitude.Text != "")
                 amplitude = double.Parse(Amplitude.Text);
             if (StartTime.Text != "")
@@ -249,7 +271,7 @@ namespace CPS
                 probability = double.Parse(Probability.Text);
         }
 
-        private void GeneratePlot(OxyPlotModel plot, String type)
+        private void GeneratePlot(OxyPlotModel plot, String type, List<KeyValuePair<double, double>> values)
         {
             if (selectedId == 0)
                 return;
@@ -260,7 +282,6 @@ namespace CPS
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, MajorStep = amplitude / 2, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             Random random = new Random();
-            values = new List<double>();
             double yValue;
             double step = 1 / samplingFrequency;
             seriesPoints = new LineSeries();
@@ -272,7 +293,7 @@ namespace CPS
                 {
                     yValue = (double)method.Invoke(this, new object[] { random, -amplitude, amplitude });
                     seriesPoints.Points.Add(new DataPoint(i, yValue));
-                    values.Add(yValue);
+                    values.Add(new KeyValuePair<double, double>(i, yValue));
                 }
                 plot.PlotModel.Series.Add(seriesPoints);
             }
@@ -283,7 +304,7 @@ namespace CPS
                 {
                     yValue = (double)method.Invoke(this, new object[] { n });
                     seriesPoints.Points.Add(new DataPoint(i, yValue));
-                    values.Add(yValue);
+                    values.Add(new KeyValuePair<double, double>(i, yValue));
                 }
                 plot.PlotModel.Series.Add(seriesPoints);
             }
@@ -295,8 +316,8 @@ namespace CPS
                 {
                     yValue = (double)method.Invoke(this, new object[] { n, k });
                     seriesPoints.Points.Add(new DataPoint(i, yValue));
-                    values.Add(yValue);
-                    if (i > basicPeriod * tmp)
+                    values.Add(new KeyValuePair<double, double>(i, yValue));
+                    if (i > startTime + (basicPeriod * tmp))
                     {
                         k++;
                         tmp++;
@@ -310,18 +331,18 @@ namespace CPS
                 {
                     yValue = (double)method.Invoke(this, new object[] { i });
                     seriesPoints.Points.Add(new DataPoint(i, yValue));
-                    values.Add(yValue);
+                    values.Add(new KeyValuePair<double, double>(i, yValue));
                 }
                 plot.PlotModel.Series.Add(seriesPoints);
             }
             else if (selectedId == 10)
             {
-                scatterSeries = new ScatterSeries(){ MarkerSize = 2 };
+                scatterSeries = new ScatterSeries() { MarkerSize = 2 };
                 for (double i = startTime; i <= endTime; i += step)
                 {
                     yValue = (double)method.Invoke(this, new object[] { i });
                     scatterSeries.Points.Add(new DataPoint(i, yValue));
-                    values.Add(yValue);
+                    values.Add(new KeyValuePair<double, double>(i, yValue));
                 }
                 plot.PlotModel.Series.Add(scatterSeries);
             }
@@ -341,18 +362,19 @@ namespace CPS
                 {
                     yValue = (double)method.Invoke(this, new object[] { random });
                     scatterSeries.Points.Add(new DataPoint(i, yValue));
-                    values.Add(yValue);
+                    values.Add(new KeyValuePair<double, double>(i, yValue));
                 }
                 plot.PlotModel.Series.Add(scatterSeries);
             }
         }
 
-        private void GenerateHistogram(Histogram histogram)
+        private void GenerateHistogram(Histogram histogram, List<KeyValuePair<double, double>> values)
         {
-            double stepForHistogram = (values.Max() - values.Min()) / numberOfCompartments;
+            List<double> xValues = (from x in values select x.Value).Distinct().ToList();
+            double stepForHistogram = (xValues.Max() - xValues.Min()) / numberOfCompartments;
             List<double> compartmentsForHistogram = new List<double>
             {
-                values.Min()
+                xValues.Min()
             };
             for (int i = 1; i < numberOfCompartments; i++)
             {
@@ -360,12 +382,12 @@ namespace CPS
             }
 
             double[] amount = new double[compartmentsForHistogram.Count];
-            for (int i = 0; i < values.Count; i++)
+            for (int i = 0; i < xValues.Count; i++)
             {
                 for (int j = 0; j < compartmentsForHistogram.Count; j++)
                     if (j == numberOfCompartments - 1)
                     {
-                        if (values[i] >= compartmentsForHistogram[j])
+                        if (xValues[i] >= compartmentsForHistogram[j])
                         {
                             amount[j] += 1;
                             break;
@@ -373,7 +395,7 @@ namespace CPS
                     }
                     else
                     {
-                        if (values[i] >= compartmentsForHistogram[j] && values[i] < compartmentsForHistogram[j + 1])
+                        if (xValues[i] >= compartmentsForHistogram[j] && xValues[i] < compartmentsForHistogram[j + 1])
                         {
                             amount[j] += 1;
                             break;
@@ -391,15 +413,148 @@ namespace CPS
         private void Generate_Click(object sender, RoutedEventArgs e)
         {
             SetParameters();
-            GeneratePlot(plot1, "Signal" + selectedId.ToString());
-            GenerateHistogram(histogram1);
+            values = new List<KeyValuePair<double, double>>();
+            GeneratePlot(plot1, "Signal" + selectedId.ToString(), values);
+            GenerateHistogram(histogram1, values);
+            CalculateParameters(values, 1);
+            firstPlotExist = true;
+            if (secondPlotExist)
+            {
+                Add.IsEnabled = true;
+                Substract.IsEnabled = true;
+                Multiply.IsEnabled = true;
+                Divide.IsEnabled = true;
+            }
         }
 
         private void Generate2_Click(object sender, RoutedEventArgs e)
         {
             SetParameters();
-            GeneratePlot(plot2, "Signal" + selectedId.ToString());
-            GenerateHistogram(histogram2);
+            values2 = new List<KeyValuePair<double, double>>();
+            GeneratePlot(plot2, "Signal" + selectedId.ToString(), values2);
+            GenerateHistogram(histogram2, values2);
+            CalculateParameters(values2, 2);
+            secondPlotExist = true;
+            if (firstPlotExist)
+            {
+                Add.IsEnabled = true;
+                Substract.IsEnabled = true;
+                Multiply.IsEnabled = true;
+                Divide.IsEnabled = true;
+            }
+        }
+
+        private void GenerateResultPlot(OxyPlotModel plot, List<KeyValuePair<double, double>> values)
+        {
+            plot.PlotModel = new PlotModel();
+            plot.PlotModel.Axes.Clear();
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            seriesPoints = new LineSeries();
+            for (int i = 0; i < values.Count; i++)
+            {
+                seriesPoints.Points.Add(new DataPoint(values[i].Key, values[i].Value));
+            }
+            plot.PlotModel.Series.Add(seriesPoints);
+        }
+
+        private void Add_Click(object sender, RoutedEventArgs e)
+        {
+            if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
+            {
+                result = new List<KeyValuePair<double, double>>();
+                for (int i = 0; i < values.Count; i++)
+                    result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value + values2[i].Value));
+                GenerateResultPlot(resultPlot, result);
+            }
+            else
+                MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
+        }
+
+        private void Substract_Click(object sender, RoutedEventArgs e)
+        {
+            if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
+            {
+                result = new List<KeyValuePair<double, double>>();
+                for (int i = 0; i < values.Count; i++)
+                    result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value - values2[i].Value));
+                GenerateResultPlot(resultPlot, result);
+            }
+            else
+                MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
+        }
+
+        private void Multiply_Click(object sender, RoutedEventArgs e)
+        {
+            if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
+            {
+                result = new List<KeyValuePair<double, double>>();
+                for (int i = 0; i < values.Count; i++)
+                    result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value * values2[i].Value));
+                GenerateResultPlot(resultPlot, result);
+            }
+            else
+                MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
+        }
+
+        private void Divide_Click(object sender, RoutedEventArgs e)
+        {
+            if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
+            {
+                result = new List<KeyValuePair<double, double>>();
+                for (int i = 0; i < values.Count; i++)
+                {
+                    if (values2[i].Value == 0)
+                        values2[i] = new KeyValuePair<double, double>(values2[i].Key, 0.0000000001);
+                    result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value / values2[i].Value));
+                }
+                GenerateResultPlot(resultPlot, result);
+            }
+            else
+                MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
+
+        }
+
+        private void CalculateParameters(List<KeyValuePair<double, double>> values, int plotId)
+        {
+            double sum = 0;
+            for (int i = 0; i < values.Count; i++)
+                sum += values[i].Value;
+            average = sum / values.Count;
+            for (int i = 0; i < values.Count; i++)
+                variance += Math.Pow((values[i].Value - average), 2);
+            variance = Math.Round(variance / values.Count, 3);
+            average = Math.Round(sum / values.Count, 3);
+
+            sum = 0;
+            for (int i = 0; i < values.Count; i++)
+                sum += Math.Abs(values[i].Value);
+            absoluteMean = Math.Round(sum / values.Count, 3);
+
+            sum = 0;
+            for (int i = 0; i < values.Count; i++)
+                sum += Math.Pow(values[i].Value, 2);
+            averagePower = sum / values.Count;
+            effectiveValue = Math.Round(Math.Sqrt(averagePower), 3);
+            averagePower = Math.Round(averagePower, 3);
+
+            if (plotId == 1)
+            {
+                Average.Text = average.ToString();
+                AbsoluteMean.Text = absoluteMean.ToString();
+                AveragePower.Text = averagePower.ToString();
+                Variance.Text = variance.ToString();
+                EffectiveValue.Text = effectiveValue.ToString();
+            }
+            else
+            {
+                Average2.Text = average.ToString();
+                AbsoluteMean2.Text = absoluteMean.ToString();
+                AveragePower2.Text = averagePower.ToString();
+                Variance2.Text = variance.ToString();
+                EffectiveValue2.Text = effectiveValue.ToString();
+            }
+
         }
     }
 }
