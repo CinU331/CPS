@@ -21,11 +21,12 @@ namespace CPS
         private double basicPeriod;
         private double fillFactor;
         private double samplingFrequency;
-        private double numberOfCompartments;
+        private int numberOfCompartments;
         private double probability;
         private int selectedId;
         private double time;
 
+        private List<SignalAndNoise> SignalsAndNoises;
         private OxyPlotModel plot1;
         private OxyPlotModel plot2;
         private OxyPlotModel resultPlot;
@@ -57,7 +58,7 @@ namespace CPS
 
         private void AddSignalAndNoisesToListBox()
         {
-            List<SignalAndNoise> SignalsAndNoises = new List<SignalAndNoise>
+            SignalsAndNoises = new List<SignalAndNoise>
             {
                 new SignalAndNoise() { Name = "Szum o rozkładzie jednostajnym", Id = 1 },
                 new SignalAndNoise() { Name = "Szum gaussowki", Id = 2 },
@@ -164,20 +165,23 @@ namespace CPS
                 return;
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
-            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, MajorStep = amplitude / 2, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             double yValue;
             double step = 1 / samplingFrequency;
             seriesPoints = new LineSeries();
             double endTime = startTime + duration;
             if (type == "load")
             {
+                plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
                 for (int i = 0; i < values.Count; i++)
                     seriesPoints.Points.Add(new DataPoint(values[i].Key, values[i].Value));
                 plot.PlotModel.Series.Add(seriesPoints);
+                plot.PlotModel.Title = SignalsAndNoises[selectedId - 1].Name;
                 return;
             }
             Random random = new Random();
+            plot.PlotModel.Title = SignalsAndNoises[selectedId - 1].Name;
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", MajorStep = amplitude / 2, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             Type t = this.GetType();
             MethodInfo method = t.GetMethod(type);
 
@@ -261,14 +265,13 @@ namespace CPS
                 plot.PlotModel.Series.Add(scatterSeries);
             }
         }
-
         private void GenerateHistogram(Histogram histogram, List<KeyValuePair<double, double>> values)
         {
-            List<double> xValues = (from x in values select x.Value).Distinct().ToList();
-            double stepForHistogram = (xValues.Max() - xValues.Min()) / numberOfCompartments;
+            List<double> yValues = (from y in values select y.Value).ToList();
+            double stepForHistogram = (yValues.Max() - yValues.Min()) / numberOfCompartments;
             List<double> compartmentsForHistogram = new List<double>
             {
-                xValues.Min()
+                yValues.Min()
             };
             for (int i = 1; i < numberOfCompartments; i++)
             {
@@ -290,12 +293,12 @@ namespace CPS
             }
 
             double[] amount = new double[compartmentsForHistogram.Count];
-            for (int i = tmp; i < xValues.Count; i++)
+            for (int i = tmp; i < yValues.Count; i++)
             {
                 for (int j = 0; j < compartmentsForHistogram.Count; j++)
                     if (j == numberOfCompartments - 1)
                     {
-                        if (xValues[i] >= compartmentsForHistogram[j])
+                        if (yValues[i] >= compartmentsForHistogram[j])
                         {
                             amount[j] += 1;
                             break;
@@ -303,7 +306,7 @@ namespace CPS
                     }
                     else
                     {
-                        if (xValues[i] >= compartmentsForHistogram[j] && xValues[i] < compartmentsForHistogram[j + 1])
+                        if (yValues[i] >= compartmentsForHistogram[j] && yValues[i] < compartmentsForHistogram[j + 1])
                         {
                             amount[j] += 1;
                             break;
@@ -312,18 +315,20 @@ namespace CPS
             }
 
             histogram.HistogramModel = new PlotModel();
+            histogram.HistogramModel.Axes.Add(new CategoryAxis { Position = AxisPosition.Bottom, Title = "Numer przedziału" });
+            histogram.HistogramModel.Axes.Add(new LinearAxis { Position = AxisPosition.Left, Title = "Liczba próbek" });
             var series = new ColumnSeries();
             for (int i = 0; i < compartmentsForHistogram.Count; i++)
                 series.Items.Add(new ColumnItem { Value = amount[i] });
             histogram.HistogramModel.Series.Add(series);
         }
-
         private void GenerateResultPlot(OxyPlotModel plot, List<KeyValuePair<double, double>> values)
         {
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
-            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            plot.PlotModel.Title = "Sygnał wynikowy";
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             seriesPoints = new LineSeries();
             for (int i = 0; i < values.Count; i++)
             {
@@ -331,7 +336,6 @@ namespace CPS
             }
             plot.PlotModel.Series.Add(seriesPoints);
         }
-
         private void CalculateParameters(List<KeyValuePair<double, double>> values, int plotId)
         {
             int n2 = values.Count;
@@ -401,9 +405,11 @@ namespace CPS
         {
             using (BinaryWriter binWriter = new BinaryWriter(File.Open(fileName, FileMode.Create)))
             {
+                binWriter.Write(selectedId);
                 binWriter.Write(startTime);
                 binWriter.Write(duration);
                 binWriter.Write(samplingFrequency);
+                binWriter.Write(numberOfCompartments);
                 for (int i = 0; i < values.Count; i++)
                 {
                     binWriter.Write(values[i].Key);
@@ -415,12 +421,16 @@ namespace CPS
         {
             using (BinaryReader binReader = new BinaryReader(File.Open(fileName, FileMode.Open)))
             {
+                selectedId = binReader.ReadInt32();
+                ListOfSignalsAndNoises.SelectedItem = selectedId;
                 startTime = binReader.ReadDouble();
                 StartTime.Text = startTime.ToString();
                 duration = binReader.ReadDouble();
                 Duration.Text = duration.ToString();
                 samplingFrequency = binReader.ReadDouble();
                 SamplingFrequency.Text = samplingFrequency.ToString();
+                numberOfCompartments = binReader.ReadInt32();
+                NumberOfCompartments.Text = numberOfCompartments.ToString();
                 values = new List<KeyValuePair<double, double>>();
                 int i = 0;
                 while (binReader.BaseStream.Position != binReader.BaseStream.Length)
@@ -476,6 +486,7 @@ namespace CPS
                 GenerateResultPlot(resultPlot, result);
                 GenerateHistogram(resultHistogram, result);
                 CalculateParameters(result, 3);
+                SaveResult.IsEnabled = true;
             }
             else
                 MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
@@ -490,6 +501,7 @@ namespace CPS
                 GenerateResultPlot(resultPlot, result);
                 GenerateHistogram(resultHistogram, result);
                 CalculateParameters(result, 3);
+                SaveResult.IsEnabled = true;
             }
             else
                 MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
@@ -504,6 +516,7 @@ namespace CPS
                 GenerateResultPlot(resultPlot, result);
                 GenerateHistogram(resultHistogram, result);
                 CalculateParameters(result, 3);
+                SaveResult.IsEnabled = true;
             }
             else
                 MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
@@ -516,12 +529,13 @@ namespace CPS
                 for (int i = 0; i < values.Count; i++)
                 {
                     if (values2[i].Value == 0)
-                        values2[i] = new KeyValuePair<double, double>(values2[i].Key, 0.0000000001);
+                        values2[i] = new KeyValuePair<double, double>(values2[i].Key, 0.000000001);
                     result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value / values2[i].Value));
                 }
                 GenerateResultPlot(resultPlot, result);
                 GenerateHistogram(resultHistogram, result);
                 CalculateParameters(result, 3);
+                SaveResult.IsEnabled = true;
             }
             else
                 MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
@@ -583,6 +597,7 @@ namespace CPS
             GenerateResultPlot(resultPlot, result);
             GenerateHistogram(resultHistogram, result);
             CalculateParameters(result, 3);
+            SaveResult.IsEnabled = true;
         }
         private void SaveResult_Click(object sender, RoutedEventArgs e)
         {
@@ -658,7 +673,7 @@ namespace CPS
             if (SamplingFrequency.Text != "")
                 samplingFrequency = double.Parse(SamplingFrequency.Text);
             if (NumberOfCompartments.Text != "")
-                numberOfCompartments = double.Parse(NumberOfCompartments.Text);
+                numberOfCompartments = int.Parse(NumberOfCompartments.Text);
             if (Probability.Text != "")
                 probability = double.Parse(Probability.Text);
         }
