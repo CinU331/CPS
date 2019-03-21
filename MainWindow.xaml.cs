@@ -1,8 +1,10 @@
-﻿using OxyPlot;
+﻿using Microsoft.Win32;
+using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -29,6 +31,7 @@ namespace CPS
         private OxyPlotModel resultPlot;
         private Histogram histogram1;
         private Histogram histogram2;
+        private Histogram resultHistogram;
         private LineSeries seriesPoints;
         private ScatterSeries scatterSeries;
         private List<KeyValuePair<double, double>> values;
@@ -48,22 +51,8 @@ namespace CPS
         public MainWindow()
         {
             InitializeComponent();
-            plot1 = new OxyPlotModel();
-            Plot1.DataContext = plot1;
-            plot2 = new OxyPlotModel();
-            Plot2.DataContext = plot2;
-            resultPlot = new OxyPlotModel();
-            ResultPlot.DataContext = resultPlot;
-            histogram1 = new Histogram();
-            Histogram1.DataContext = histogram1;
-            histogram2 = new Histogram();
-            Histogram2.DataContext = histogram2;
+            SetDataContext();
             AddSignalAndNoisesToListBox();
-
-            Add.IsEnabled = false;
-            Substract.IsEnabled = false;
-            Multiply.IsEnabled = false;
-            Divide.IsEnabled = false;
         }
 
         private void AddSignalAndNoisesToListBox()
@@ -85,90 +74,7 @@ namespace CPS
             ListOfSignalsAndNoises.ItemsSource = SignalsAndNoises;
         }
 
-        #region SetsOfParameters
-        private void FirstSetOfParameters()
-        {
-            Amplitude.IsEnabled = true;
-            StartTime.IsEnabled = true;
-            Duration.IsEnabled = true;
-            BasicPeriod.IsEnabled = false;
-            FillFactor.IsEnabled = false;
-            Probability.IsEnabled = false;
-        }
-
-        private void SecondSetOfParameters()
-        {
-            Amplitude.IsEnabled = true;
-            StartTime.IsEnabled = true;
-            Duration.IsEnabled = true;
-            BasicPeriod.IsEnabled = true;
-            FillFactor.IsEnabled = false;
-            Probability.IsEnabled = false;
-        }
-
-        private void ThirdSetOfParameters()
-        {
-            Amplitude.IsEnabled = true;
-            StartTime.IsEnabled = true;
-            Duration.IsEnabled = true;
-            BasicPeriod.IsEnabled = true;
-            FillFactor.IsEnabled = true;
-            Probability.IsEnabled = false;
-        }
-
-        private void FourthSetOfParameters()
-        {
-            Amplitude.IsEnabled = true;
-            StartTime.IsEnabled = true;
-            Duration.IsEnabled = true;
-            BasicPeriod.IsEnabled = false;
-            FillFactor.IsEnabled = false;
-            Probability.IsEnabled = true;
-        }
-        #endregion
-
-        private void ListOfSignalsAndNoises_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (ListOfSignalsAndNoises.SelectedItem != null)
-            {
-                var item = (ListBox)sender;
-                var SignalAndNoise = (SignalAndNoise)item.SelectedItem;
-                selectedId = SignalAndNoise.Id;
-                switch (selectedId)
-                {
-                    case 1:
-                    case 2:
-                        FirstSetOfParameters();
-                        break;
-                    case 3:
-                    case 4:
-                    case 5:
-                        SecondSetOfParameters();
-                        break;
-                    case 6:
-                    case 7:
-                    case 8:
-                        ThirdSetOfParameters();
-                        break;
-                    case 9:
-                    case 10:
-                        FirstSetOfParameters();
-                        break;
-                    case 11:
-                        FourthSetOfParameters();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        private void Parameters_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            e.Cancel = true;
-        }
-
-        #region Signals
+        #region SignalsEquation
         public double Signal1(Random random, double minimum, double maximum)
         {
             return random.NextDouble() * (maximum - minimum) + minimum;
@@ -251,41 +157,29 @@ namespace CPS
             return tmpForRand[index];
         }
         #endregion
-        private void SetParameters()
-        {
-            if (Amplitude.Text != "")
-                amplitude = double.Parse(Amplitude.Text);
-            if (StartTime.Text != "")
-                startTime = double.Parse(StartTime.Text);
-            if (Duration.Text != "")
-                duration = double.Parse(Duration.Text);
-            if (BasicPeriod.Text != "")
-                basicPeriod = double.Parse(BasicPeriod.Text);
-            if (FillFactor.Text != "")
-                fillFactor = double.Parse(FillFactor.Text);
-            if (SamplingFrequency.Text != "")
-                samplingFrequency = double.Parse(SamplingFrequency.Text);
-            if (NumberOfCompartments.Text != "")
-                numberOfCompartments = double.Parse(NumberOfCompartments.Text);
-            if (Probability.Text != "")
-                probability = double.Parse(Probability.Text);
-        }
-
+        #region GeneratingPlots
         private void GeneratePlot(OxyPlotModel plot, String type, List<KeyValuePair<double, double>> values)
         {
             if (selectedId == 0)
                 return;
-            Type t = this.GetType();
-            MethodInfo method = t.GetMethod(type);
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, MajorStep = amplitude / 2, AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
-            Random random = new Random();
             double yValue;
             double step = 1 / samplingFrequency;
             seriesPoints = new LineSeries();
             double endTime = startTime + duration;
+            if (type == "load")
+            {
+                for (int i = 0; i < values.Count; i++)
+                    seriesPoints.Points.Add(new DataPoint(values[i].Key, values[i].Value));
+                plot.PlotModel.Series.Add(seriesPoints);
+                return;
+            }
+            Random random = new Random();
+            Type t = this.GetType();
+            MethodInfo method = t.GetMethod(type);
 
             if (selectedId == 1 || selectedId == 2)
             {
@@ -381,8 +275,22 @@ namespace CPS
                 compartmentsForHistogram.Add(compartmentsForHistogram[i - 1] + stepForHistogram);
             }
 
+            int tmp = 0;
+            if (selectedId >= 3 && selectedId <= 9)
+            {
+                if ((duration / basicPeriod) % 1 != 0)
+                {
+                    double endTime = startTime + duration;
+                    int step = (int)Math.Floor(duration / basicPeriod);
+                    double start = endTime - (step * basicPeriod);
+                    for (int i = 0; i < values.Count; i++)
+                        if (values[i].Key < start)
+                            tmp++;
+                }
+            }
+
             double[] amount = new double[compartmentsForHistogram.Count];
-            for (int i = 0; i < xValues.Count; i++)
+            for (int i = tmp; i < xValues.Count; i++)
             {
                 for (int j = 0; j < compartmentsForHistogram.Count; j++)
                     if (j == numberOfCompartments - 1)
@@ -410,40 +318,6 @@ namespace CPS
             histogram.HistogramModel.Series.Add(series);
         }
 
-        private void Generate_Click(object sender, RoutedEventArgs e)
-        {
-            SetParameters();
-            values = new List<KeyValuePair<double, double>>();
-            GeneratePlot(plot1, "Signal" + selectedId.ToString(), values);
-            GenerateHistogram(histogram1, values);
-            CalculateParameters(values, 1);
-            firstPlotExist = true;
-            if (secondPlotExist)
-            {
-                Add.IsEnabled = true;
-                Substract.IsEnabled = true;
-                Multiply.IsEnabled = true;
-                Divide.IsEnabled = true;
-            }
-        }
-
-        private void Generate2_Click(object sender, RoutedEventArgs e)
-        {
-            SetParameters();
-            values2 = new List<KeyValuePair<double, double>>();
-            GeneratePlot(plot2, "Signal" + selectedId.ToString(), values2);
-            GenerateHistogram(histogram2, values2);
-            CalculateParameters(values2, 2);
-            secondPlotExist = true;
-            if (firstPlotExist)
-            {
-                Add.IsEnabled = true;
-                Substract.IsEnabled = true;
-                Multiply.IsEnabled = true;
-                Divide.IsEnabled = true;
-            }
-        }
-
         private void GenerateResultPlot(OxyPlotModel plot, List<KeyValuePair<double, double>> values)
         {
             plot.PlotModel = new PlotModel();
@@ -458,6 +332,140 @@ namespace CPS
             plot.PlotModel.Series.Add(seriesPoints);
         }
 
+        private void CalculateParameters(List<KeyValuePair<double, double>> values, int plotId)
+        {
+            int n2 = values.Count;
+            int n1 = 1, tmp = 0;
+            if (selectedId >= 3 && selectedId <= 9)
+            {
+                if ((duration / basicPeriod) % 1 != 0)
+                {
+                    double endTime = startTime + duration;
+                    int step = (int)Math.Floor(duration / basicPeriod);
+                    double start = endTime - (step * basicPeriod);
+                    for (int i = 0; i < n2; i++)
+                        if (values[i].Key < start)
+                            tmp++;
+                    n1 = tmp;
+                }
+            }
+            double sum = 0;
+            for (int i = tmp; i < n2; i++)
+                sum += values[i].Value;
+            average = sum / (n2 - n1 + 1);
+            for (int i = tmp; i < n2; i++)
+                variance += Math.Pow((values[i].Value - average), 2);
+            variance = Math.Round(variance / (n2 - n1 + 1), 3);
+            average = Math.Round(sum / (n2 - n1 + 1), 3);
+
+            sum = 0;
+            for (int i = tmp; i < n2; i++)
+                sum += Math.Abs(values[i].Value);
+            absoluteMean = Math.Round(sum / (n2 - n1 + 1), 3);
+
+            sum = 0;
+            for (int i = tmp; i < n2; i++)
+                sum += Math.Pow(values[i].Value, 2);
+            averagePower = sum / (n2 - n1 + 1);
+            effectiveValue = Math.Round(Math.Sqrt(averagePower), 3);
+            averagePower = Math.Round(averagePower, 3);
+
+            if (plotId == 1)
+            {
+                Average.Text = average.ToString();
+                AbsoluteMean.Text = absoluteMean.ToString();
+                AveragePower.Text = averagePower.ToString();
+                Variance.Text = variance.ToString();
+                EffectiveValue.Text = effectiveValue.ToString();
+            }
+            else if (plotId == 2)
+            {
+                Average2.Text = average.ToString();
+                AbsoluteMean2.Text = absoluteMean.ToString();
+                AveragePower2.Text = averagePower.ToString();
+                Variance2.Text = variance.ToString();
+                EffectiveValue2.Text = effectiveValue.ToString();
+            }
+            else
+            {
+                ResultAverage.Text = average.ToString();
+                ResultAbsoluteMean.Text = absoluteMean.ToString();
+                ResultAveragePower.Text = averagePower.ToString();
+                ResultVariance.Text = variance.ToString();
+                ResultEffectiveValue.Text = effectiveValue.ToString();
+            }
+        }
+        #endregion
+        #region BinFiles
+        private void SaveToBinFile(string fileName, List<KeyValuePair<double, double>> values)
+        {
+            using (BinaryWriter binWriter = new BinaryWriter(File.Open(fileName, FileMode.Create)))
+            {
+                binWriter.Write(startTime);
+                binWriter.Write(duration);
+                binWriter.Write(samplingFrequency);
+                for (int i = 0; i < values.Count; i++)
+                {
+                    binWriter.Write(values[i].Key);
+                    binWriter.Write(values[i].Value);
+                }
+            }
+        }
+        private void LoadFromBinFile(string fileName, ref List<KeyValuePair<double, double>> values)
+        {
+            using (BinaryReader binReader = new BinaryReader(File.Open(fileName, FileMode.Open)))
+            {
+                startTime = binReader.ReadDouble();
+                StartTime.Text = startTime.ToString();
+                duration = binReader.ReadDouble();
+                Duration.Text = duration.ToString();
+                samplingFrequency = binReader.ReadDouble();
+                SamplingFrequency.Text = samplingFrequency.ToString();
+                values = new List<KeyValuePair<double, double>>();
+                int i = 0;
+                while (binReader.BaseStream.Position != binReader.BaseStream.Length)
+                {
+                    values.Insert(i, new KeyValuePair<double, double>(binReader.ReadDouble(), binReader.ReadDouble()));
+                    i++;
+                }
+            }
+        }
+        #endregion
+        #region ButtonsOnClick
+        private void Generate_Click(object sender, RoutedEventArgs e)
+        {
+            SetParametersFromTextBox();
+            values = new List<KeyValuePair<double, double>>();
+            GeneratePlot(plot1, "Signal" + selectedId.ToString(), values);
+            GenerateHistogram(histogram1, values);
+            CalculateParameters(values, 1);
+            firstPlotExist = true;
+            Save1.IsEnabled = true;
+            if (secondPlotExist)
+            {
+                Add.IsEnabled = true;
+                Substract.IsEnabled = true;
+                Multiply.IsEnabled = true;
+                Divide.IsEnabled = true;
+            }
+        }
+        private void Generate2_Click(object sender, RoutedEventArgs e)
+        {
+            SetParametersFromTextBox();
+            values2 = new List<KeyValuePair<double, double>>();
+            GeneratePlot(plot2, "Signal" + selectedId.ToString(), values2);
+            GenerateHistogram(histogram2, values2);
+            CalculateParameters(values2, 2);
+            secondPlotExist = true;
+            Save2.IsEnabled = true;
+            if (firstPlotExist)
+            {
+                Add.IsEnabled = true;
+                Substract.IsEnabled = true;
+                Multiply.IsEnabled = true;
+                Divide.IsEnabled = true;
+            }
+        }
         private void Add_Click(object sender, RoutedEventArgs e)
         {
             if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
@@ -466,11 +474,12 @@ namespace CPS
                 for (int i = 0; i < values.Count; i++)
                     result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value + values2[i].Value));
                 GenerateResultPlot(resultPlot, result);
+                GenerateHistogram(resultHistogram, result);
+                CalculateParameters(result, 3);
             }
             else
                 MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
         }
-
         private void Substract_Click(object sender, RoutedEventArgs e)
         {
             if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
@@ -479,11 +488,12 @@ namespace CPS
                 for (int i = 0; i < values.Count; i++)
                     result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value - values2[i].Value));
                 GenerateResultPlot(resultPlot, result);
+                GenerateHistogram(resultHistogram, result);
+                CalculateParameters(result, 3);
             }
             else
                 MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
         }
-
         private void Multiply_Click(object sender, RoutedEventArgs e)
         {
             if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
@@ -492,11 +502,12 @@ namespace CPS
                 for (int i = 0; i < values.Count; i++)
                     result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value * values2[i].Value));
                 GenerateResultPlot(resultPlot, result);
+                GenerateHistogram(resultHistogram, result);
+                CalculateParameters(result, 3);
             }
             else
                 MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
         }
-
         private void Divide_Click(object sender, RoutedEventArgs e)
         {
             if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
@@ -509,52 +520,187 @@ namespace CPS
                     result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value / values2[i].Value));
                 }
                 GenerateResultPlot(resultPlot, result);
+                GenerateHistogram(resultHistogram, result);
+                CalculateParameters(result, 3);
             }
             else
                 MessageBox.Show("Sygnały znajdują się w innym przedziale czasowym bądź mają inną częstotliwość próbkowania.");
 
         }
-
-        private void CalculateParameters(List<KeyValuePair<double, double>> values, int plotId)
+        private void Load1_Click(object sender, RoutedEventArgs e)
         {
-            double sum = 0;
-            for (int i = 0; i < values.Count; i++)
-                sum += values[i].Value;
-            average = sum / values.Count;
-            for (int i = 0; i < values.Count; i++)
-                variance += Math.Pow((values[i].Value - average), 2);
-            variance = Math.Round(variance / values.Count, 3);
-            average = Math.Round(sum / values.Count, 3);
-
-            sum = 0;
-            for (int i = 0; i < values.Count; i++)
-                sum += Math.Abs(values[i].Value);
-            absoluteMean = Math.Round(sum / values.Count, 3);
-
-            sum = 0;
-            for (int i = 0; i < values.Count; i++)
-                sum += Math.Pow(values[i].Value, 2);
-            averagePower = sum / values.Count;
-            effectiveValue = Math.Round(Math.Sqrt(averagePower), 3);
-            averagePower = Math.Round(averagePower, 3);
-
-            if (plotId == 1)
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+                LoadFromBinFile(openFileDialog.FileName, ref values);
+            GeneratePlot(plot1, "load", values);
+            GenerateHistogram(histogram1, values);
+            CalculateParameters(values, 1);
+            firstPlotExist = true;
+            Save1.IsEnabled = true;
+            if (secondPlotExist)
             {
-                Average.Text = average.ToString();
-                AbsoluteMean.Text = absoluteMean.ToString();
-                AveragePower.Text = averagePower.ToString();
-                Variance.Text = variance.ToString();
-                EffectiveValue.Text = effectiveValue.ToString();
+                Add.IsEnabled = true;
+                Substract.IsEnabled = true;
+                Multiply.IsEnabled = true;
+                Divide.IsEnabled = true;
             }
-            else
-            {
-                Average2.Text = average.ToString();
-                AbsoluteMean2.Text = absoluteMean.ToString();
-                AveragePower2.Text = averagePower.ToString();
-                Variance2.Text = variance.ToString();
-                EffectiveValue2.Text = effectiveValue.ToString();
-            }
-
         }
+        private void Save1_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+                SaveToBinFile(saveFileDialog.FileName, values);
+        }
+        private void Load2_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+                LoadFromBinFile(openFileDialog.FileName, ref values2);
+            GeneratePlot(plot2, "load", values2);
+            GenerateHistogram(histogram2, values2);
+            CalculateParameters(values2, 2);
+            secondPlotExist = true;
+            Save2.IsEnabled = true;
+            if (firstPlotExist)
+            {
+                Add.IsEnabled = true;
+                Substract.IsEnabled = true;
+                Multiply.IsEnabled = true;
+                Divide.IsEnabled = true;
+            }
+        }
+        private void Save2_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+                SaveToBinFile(saveFileDialog.FileName, values2);
+        }
+        private void LoadResult_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+                LoadFromBinFile(openFileDialog.FileName, ref result);
+            GenerateResultPlot(resultPlot, result);
+            GenerateHistogram(resultHistogram, result);
+            CalculateParameters(result, 3);
+        }
+        private void SaveResult_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+                SaveToBinFile(saveFileDialog.FileName, result);
+        }
+        #endregion
+        #region SetsOfParameters
+        private void FirstSetOfParameters()
+        {
+            Amplitude.IsEnabled = true;
+            StartTime.IsEnabled = true;
+            Duration.IsEnabled = true;
+            BasicPeriod.IsEnabled = false;
+            FillFactor.IsEnabled = false;
+            Probability.IsEnabled = false;
+        }
+        private void SecondSetOfParameters()
+        {
+            Amplitude.IsEnabled = true;
+            StartTime.IsEnabled = true;
+            Duration.IsEnabled = true;
+            BasicPeriod.IsEnabled = true;
+            FillFactor.IsEnabled = false;
+            Probability.IsEnabled = false;
+        }
+        private void ThirdSetOfParameters()
+        {
+            Amplitude.IsEnabled = true;
+            StartTime.IsEnabled = true;
+            Duration.IsEnabled = true;
+            BasicPeriod.IsEnabled = true;
+            FillFactor.IsEnabled = true;
+            Probability.IsEnabled = false;
+        }
+        private void FourthSetOfParameters()
+        {
+            Amplitude.IsEnabled = true;
+            StartTime.IsEnabled = true;
+            Duration.IsEnabled = true;
+            BasicPeriod.IsEnabled = false;
+            FillFactor.IsEnabled = false;
+            Probability.IsEnabled = true;
+        }
+        private void SetDataContext()
+        {
+            plot1 = new OxyPlotModel();
+            Plot1.DataContext = plot1;
+            plot2 = new OxyPlotModel();
+            Plot2.DataContext = plot2;
+            resultPlot = new OxyPlotModel();
+            ResultPlot.DataContext = resultPlot;
+            histogram1 = new Histogram();
+            Histogram1.DataContext = histogram1;
+            histogram2 = new Histogram();
+            Histogram2.DataContext = histogram2;
+            resultHistogram = new Histogram();
+            ResultHistogram.DataContext = resultHistogram;
+        }
+        private void SetParametersFromTextBox()
+        {
+            if (Amplitude.Text != "")
+                amplitude = double.Parse(Amplitude.Text);
+            if (StartTime.Text != "")
+                startTime = double.Parse(StartTime.Text);
+            if (Duration.Text != "")
+                duration = double.Parse(Duration.Text);
+            if (BasicPeriod.Text != "")
+                basicPeriod = double.Parse(BasicPeriod.Text);
+            if (FillFactor.Text != "")
+                fillFactor = double.Parse(FillFactor.Text);
+            if (SamplingFrequency.Text != "")
+                samplingFrequency = double.Parse(SamplingFrequency.Text);
+            if (NumberOfCompartments.Text != "")
+                numberOfCompartments = double.Parse(NumberOfCompartments.Text);
+            if (Probability.Text != "")
+                probability = double.Parse(Probability.Text);
+        }
+        private void ListOfSignalsAndNoises_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ListOfSignalsAndNoises.SelectedItem != null)
+            {
+                var item = (ListBox)sender;
+                var SignalAndNoise = (SignalAndNoise)item.SelectedItem;
+                selectedId = SignalAndNoise.Id;
+                switch (selectedId)
+                {
+                    case 1:
+                    case 2:
+                        FirstSetOfParameters();
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        SecondSetOfParameters();
+                        break;
+                    case 6:
+                    case 7:
+                    case 8:
+                        ThirdSetOfParameters();
+                        break;
+                    case 9:
+                    case 10:
+                        FirstSetOfParameters();
+                        break;
+                    case 11:
+                        FourthSetOfParameters();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        private void Parameters_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            e.Cancel = true;
+        }
+        #endregion
     }
 }
