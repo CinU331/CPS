@@ -374,8 +374,7 @@ namespace CPS
             seriesPoints = new LineSeries() { Color = OxyColors.Black };
             for (int i = 0; i < values.Count; i++)
             {
-                double yValue = Math.Floor(values[i].Value);
-                var nearest = levelsOfQuantization.OrderBy(v => Math.Abs((long) v - yValue)).First();
+                double nearest = levelsOfQuantization.TakeWhile(p => p <= values[i].Value).LastOrDefault();
                 seriesPoints.Points.Add(new DataPoint(values[i].Key, nearest));
                 quantizedValues.Add(new KeyValuePair<double, double>(values[i].Key, nearest));
             }
