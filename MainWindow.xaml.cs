@@ -336,6 +336,8 @@ namespace CPS
             }
             plot.PlotModel.Series.Add(seriesPoints);
         }
+        #endregion
+        #region CalculateParameters
         private void CalculateParameters(List<KeyValuePair<double, double>> values, int plotId)
         {
             int n2 = values.Count;
@@ -397,47 +399,6 @@ namespace CPS
                 ResultAveragePower.Text = averagePower.ToString();
                 ResultVariance.Text = variance.ToString();
                 ResultEffectiveValue.Text = effectiveValue.ToString();
-            }
-        }
-        #endregion
-        #region BinFiles
-        private void SaveToBinFile(string fileName, List<KeyValuePair<double, double>> values)
-        {
-            using (BinaryWriter binWriter = new BinaryWriter(File.Open(fileName, FileMode.Create)))
-            {
-                binWriter.Write(selectedId);
-                binWriter.Write(startTime);
-                binWriter.Write(duration);
-                binWriter.Write(samplingFrequency);
-                binWriter.Write(numberOfCompartments);
-                for (int i = 0; i < values.Count; i++)
-                {
-                    binWriter.Write(values[i].Key);
-                    binWriter.Write(values[i].Value);
-                }
-            }
-        }
-        private void LoadFromBinFile(string fileName, ref List<KeyValuePair<double, double>> values)
-        {
-            using (BinaryReader binReader = new BinaryReader(File.Open(fileName, FileMode.Open)))
-            {
-                selectedId = binReader.ReadInt32();
-                ListOfSignalsAndNoises.SelectedItem = selectedId;
-                startTime = binReader.ReadDouble();
-                StartTime.Text = startTime.ToString();
-                duration = binReader.ReadDouble();
-                Duration.Text = duration.ToString();
-                samplingFrequency = binReader.ReadDouble();
-                SamplingFrequency.Text = samplingFrequency.ToString();
-                numberOfCompartments = binReader.ReadInt32();
-                NumberOfCompartments.Text = numberOfCompartments.ToString();
-                values = new List<KeyValuePair<double, double>>();
-                int i = 0;
-                while (binReader.BaseStream.Position != binReader.BaseStream.Length)
-                {
-                    values.Insert(i, new KeyValuePair<double, double>(binReader.ReadDouble(), binReader.ReadDouble()));
-                    i++;
-                }
             }
         }
         #endregion
@@ -715,6 +676,47 @@ namespace CPS
         private void Parameters_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             e.Cancel = true;
+        }
+        #endregion
+        #region BinFiles
+        private void SaveToBinFile(string fileName, List<KeyValuePair<double, double>> values)
+        {
+            using (BinaryWriter binWriter = new BinaryWriter(File.Open(fileName, FileMode.Create)))
+            {
+                binWriter.Write(selectedId);
+                binWriter.Write(startTime);
+                binWriter.Write(duration);
+                binWriter.Write(samplingFrequency);
+                binWriter.Write(numberOfCompartments);
+                for (int i = 0; i < values.Count; i++)
+                {
+                    binWriter.Write(values[i].Key);
+                    binWriter.Write(values[i].Value);
+                }
+            }
+        }
+        private void LoadFromBinFile(string fileName, ref List<KeyValuePair<double, double>> values)
+        {
+            using (BinaryReader binReader = new BinaryReader(File.Open(fileName, FileMode.Open)))
+            {
+                selectedId = binReader.ReadInt32();
+                ListOfSignalsAndNoises.SelectedItem = selectedId;
+                startTime = binReader.ReadDouble();
+                StartTime.Text = startTime.ToString();
+                duration = binReader.ReadDouble();
+                Duration.Text = duration.ToString();
+                samplingFrequency = binReader.ReadDouble();
+                SamplingFrequency.Text = samplingFrequency.ToString();
+                numberOfCompartments = binReader.ReadInt32();
+                NumberOfCompartments.Text = numberOfCompartments.ToString();
+                values = new List<KeyValuePair<double, double>>();
+                int i = 0;
+                while (binReader.BaseStream.Position != binReader.BaseStream.Length)
+                {
+                    values.Insert(i, new KeyValuePair<double, double>(binReader.ReadDouble(), binReader.ReadDouble()));
+                    i++;
+                }
+            }
         }
         #endregion
     }
