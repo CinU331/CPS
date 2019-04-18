@@ -38,9 +38,11 @@ namespace CPS
         private List<KeyValuePair<double, double>> values;
         private List<KeyValuePair<double, double>> values2;
         private List<KeyValuePair<double, double>> result;
+        private List<KeyValuePair<double, double>> sampledValues;
         private double[] tmpForRand;
         private bool firstPlotExist;
         private bool secondPlotExist;
+        private int selectedExercise;
 
         private double average;
         private double absoluteMean;
@@ -335,6 +337,23 @@ namespace CPS
                 seriesPoints.Points.Add(new DataPoint(values[i].Key, values[i].Value));
             }
             plot.PlotModel.Series.Add(seriesPoints);
+        }
+        private void GenerateSampledSignal(OxyPlotModel plot, List<KeyValuePair<double, double>> values)
+        {
+            int nSample = (int)samplingFrequency;
+            sampledValues = new List<KeyValuePair<double, double>>();
+            plot.PlotModel = new PlotModel();
+            plot.PlotModel.Axes.Clear();
+            plot.PlotModel.Title = "Spróbkowany sygnał";
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            scatterSeries = new ScatterSeries() { MarkerSize = 2 };
+            for (int i = 0; i < values.Count; i = i + nSample)
+            {
+                scatterSeries.Points.Add(new DataPoint(values[i].Key, values[i].Value));
+                sampledValues.Add(new KeyValuePair<double, double>(values[i].Key, values[i].Value));
+            }
+            plot.PlotModel.Series.Add(scatterSeries);
         }
         #endregion
         #region CalculateParameters
@@ -719,5 +738,37 @@ namespace CPS
             }
         }
         #endregion
+
+        private void Exercise_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedExercise = Exercises.SelectedIndex;
+            switch(selectedExercise)
+            {
+                case 0:
+                    Generate2.Content = "Generuj drugi wykres";
+                    Generate2.Click += Generate2_Click;
+                    Generate2.Click -= Sample_Click;
+                    SamplingFrequencyText.Text = "Częstotliwość próbkowania";
+                    break;
+                case 1:
+                    Generate2.Content = "Próbkuj sygnał";
+                    Generate2.Click -= Generate2_Click;
+                    Generate2.Click += Sample_Click;
+                    SamplingFrequencyText.Text = "Próbkuj co ile próbek";
+                    break;
+            }
+        }
+
+        private void Sample_Click(object sender, RoutedEventArgs e)
+        {
+            if (firstPlotExist)
+            {
+                if (SamplingFrequency.Text != "")
+                    samplingFrequency = double.Parse(SamplingFrequency.Text);
+                GenerateSampledSignal(plot2, values);
+                GenerateHistogram(histogram2, sampledValues);
+                CalculateParameters(values, 2);
+            }
+        }
     }
 }
