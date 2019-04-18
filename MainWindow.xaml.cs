@@ -34,11 +34,13 @@ namespace CPS
         private Histogram histogram2;
         private Histogram resultHistogram;
         private LineSeries seriesPoints;
+        private LineSeries originalSignalPoints;
         private ScatterSeries scatterSeries;
         private List<KeyValuePair<double, double>> values;
         private List<KeyValuePair<double, double>> values2;
         private List<KeyValuePair<double, double>> result;
         private List<KeyValuePair<double, double>> sampledValues;
+        private List<KeyValuePair<double, double>> quantizedValues;
         private double[] tmpForRand;
         private bool firstPlotExist;
         private bool secondPlotExist;
@@ -170,14 +172,14 @@ namespace CPS
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             double yValue;
             double step = 1 / samplingFrequency;
-            seriesPoints = new LineSeries();
+            originalSignalPoints = new LineSeries();
             double endTime = startTime + duration;
             if (type == "load")
             {
                 plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
                 for (int i = 0; i < values.Count; i++)
-                    seriesPoints.Points.Add(new DataPoint(values[i].Key, values[i].Value));
-                plot.PlotModel.Series.Add(seriesPoints);
+                    originalSignalPoints.Points.Add(new DataPoint(values[i].Key, values[i].Value));
+                plot.PlotModel.Series.Add(originalSignalPoints);
                 plot.PlotModel.Title = SignalsAndNoises[selectedId - 1].Name;
                 return;
             }
@@ -192,10 +194,10 @@ namespace CPS
                 for (double i = startTime; i <= endTime; i += step)
                 {
                     yValue = (double)method.Invoke(this, new object[] { random, -amplitude, amplitude });
-                    seriesPoints.Points.Add(new DataPoint(i, yValue));
+                    originalSignalPoints.Points.Add(new DataPoint(i, yValue));
                     values.Add(new KeyValuePair<double, double>(i, yValue));
                 }
-                plot.PlotModel.Series.Add(seriesPoints);
+                plot.PlotModel.Series.Add(originalSignalPoints);
             }
             else if (selectedId >= 3 && selectedId <= 5)
             {
@@ -203,10 +205,10 @@ namespace CPS
                 for (double i = startTime; i <= endTime; i += step, n++)
                 {
                     yValue = (double)method.Invoke(this, new object[] { n });
-                    seriesPoints.Points.Add(new DataPoint(i, yValue));
+                    originalSignalPoints.Points.Add(new DataPoint(i, yValue));
                     values.Add(new KeyValuePair<double, double>(i, yValue));
                 }
-                plot.PlotModel.Series.Add(seriesPoints);
+                plot.PlotModel.Series.Add(originalSignalPoints);
             }
             else if (selectedId >= 6 && selectedId <= 8)
             {
@@ -215,7 +217,7 @@ namespace CPS
                 for (double i = startTime; i <= endTime; i += step, n++)
                 {
                     yValue = (double)method.Invoke(this, new object[] { n, k });
-                    seriesPoints.Points.Add(new DataPoint(i, yValue));
+                    originalSignalPoints.Points.Add(new DataPoint(i, yValue));
                     values.Add(new KeyValuePair<double, double>(i, yValue));
                     if (i > startTime + (basicPeriod * tmp))
                     {
@@ -223,17 +225,17 @@ namespace CPS
                         tmp++;
                     }
                 }
-                plot.PlotModel.Series.Add(seriesPoints);
+                plot.PlotModel.Series.Add(originalSignalPoints);
             }
             else if (selectedId == 9)
             {
                 for (double i = startTime; i <= endTime; i += step)
                 {
                     yValue = (double)method.Invoke(this, new object[] { i });
-                    seriesPoints.Points.Add(new DataPoint(i, yValue));
+                    originalSignalPoints.Points.Add(new DataPoint(i, yValue));
                     values.Add(new KeyValuePair<double, double>(i, yValue));
                 }
-                plot.PlotModel.Series.Add(seriesPoints);
+                plot.PlotModel.Series.Add(originalSignalPoints);
             }
             else if (selectedId == 10)
             {
@@ -344,7 +346,7 @@ namespace CPS
             sampledValues = new List<KeyValuePair<double, double>>();
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Title = "Spróbkowany sygnał";
+            plot.PlotModel.Title = "Po próbkowaniu";
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             scatterSeries = new ScatterSeries() { MarkerSize = 2 };
@@ -354,6 +356,31 @@ namespace CPS
                 sampledValues.Add(new KeyValuePair<double, double>(values[i].Key, values[i].Value));
             }
             plot.PlotModel.Series.Add(scatterSeries);
+        }
+        private void GenerateQuantizedSignal(OxyPlotModel plot, List<KeyValuePair<double, double>> values)
+        {
+            double yMin = sampledValues.OrderBy(s => s.Value).First().Value;
+            double yMax = sampledValues.OrderBy(s => s.Value).Last().Value;
+            double step = Math.Abs(yMax - yMin) / samplingFrequency;
+            List<double> levelsOfQuantization = new List<double>();
+            for (int i = 0; i < samplingFrequency; i++)
+                levelsOfQuantization.Add(yMin + i * step);
+            quantizedValues = new List<KeyValuePair<double, double>>();
+            plot.PlotModel = new PlotModel();
+            plot.PlotModel.Axes.Clear();
+            plot.PlotModel.Title = "Po kwantyzacji (czarny), oryginalny sygnał (zielony)";
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            seriesPoints = new LineSeries() { Color = OxyColors.Black };
+            for (int i = 0; i < values.Count; i++)
+            {
+                double yValue = Math.Floor(values[i].Value);
+                var nearest = levelsOfQuantization.OrderBy(v => Math.Abs((long) v - yValue)).First();
+                seriesPoints.Points.Add(new DataPoint(values[i].Key, nearest));
+                quantizedValues.Add(new KeyValuePair<double, double>(values[i].Key, nearest));
+            }
+            plot.PlotModel.Series.Add(seriesPoints);
+            plot.PlotModel.Series.Add(originalSignalPoints);
         }
         #endregion
         #region CalculateParameters
@@ -742,19 +769,19 @@ namespace CPS
         private void Exercise_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             selectedExercise = Exercises.SelectedIndex;
-            switch(selectedExercise)
+            switch (selectedExercise)
             {
                 case 0:
                     Generate2.Content = "Generuj drugi wykres";
                     Generate2.Click += Generate2_Click;
                     Generate2.Click -= Sample_Click;
-                    SamplingFrequencyText.Text = "Częstotliwość próbkowania";
+                    SamplingFrequencyText.Text = "Częstotliwość próbkowania:";
                     break;
                 case 1:
-                    Generate2.Content = "Próbkuj sygnał";
+                    Generate2.Content = "Próbkowanie";
                     Generate2.Click -= Generate2_Click;
                     Generate2.Click += Sample_Click;
-                    SamplingFrequencyText.Text = "Próbkuj co ile próbek";
+                    SamplingFrequencyText.Text = "Próbkuj co ile próbek:";
                     break;
             }
         }
@@ -767,8 +794,26 @@ namespace CPS
                     samplingFrequency = double.Parse(SamplingFrequency.Text);
                 GenerateSampledSignal(plot2, values);
                 GenerateHistogram(histogram2, sampledValues);
-                CalculateParameters(values, 2);
+                CalculateParameters(sampledValues, 2);
+                PrepareForQuantization();
             }
+        }
+
+        private void PrepareForQuantization()
+        {
+            SamplingFrequencyText.Text = "Liczba poziomów kwantyzacji:";
+            Generate2.Content = "Kwantyzacja";
+            Generate2.Click -= Sample_Click;
+            Generate2.Click += Quantization_Click;
+        }
+
+        private void Quantization_Click(object sender, RoutedEventArgs e)
+        {
+            if (SamplingFrequency.Text != "")
+                samplingFrequency = double.Parse(SamplingFrequency.Text);
+            GenerateQuantizedSignal(plot2, sampledValues);
+            GenerateHistogram(histogram2, quantizedValues);
+            CalculateParameters(quantizedValues, 2);
         }
     }
 }

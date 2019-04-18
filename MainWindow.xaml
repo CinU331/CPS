@@ -46,7 +46,7 @@
             <TextBox Name="Duration" Text ="20" FontSize="20" HorizontalAlignment="Left" Height="37" Margin="541,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="51"/>
             <TextBox Name="BasicPeriod" Text ="2" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="831,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
             <TextBox Name="FillFactor" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1092,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
-            <TextBox Name="SamplingFrequency" Text ="1024" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="541,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox Name="SamplingFrequency" Text ="16" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="541,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <TextBox Name="NumberOfCompartments" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="831,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
             <TextBox Name="Probability" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1297,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
             <TextBox Name="Average" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="457,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
@@ -55,7 +55,7 @@
             <TextBox Name="Variance" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="1039,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
             <TextBox Name="EffectiveValue" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="1217,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <Button Name="Generate" Click="Generate_Click" Content="Generuj pierwszy wykres" FontSize="20" HorizontalAlignment="Left" Margin="668,292,0,0" VerticalAlignment="Top" Width="250" Height="50"/>
-            <Button Name="Generate2" Click="Generate2_Click" Content="Generuj drugi wykres" FontSize="20" HorizontalAlignment="Left" Margin="988,292,0,0" VerticalAlignment="Top" Width="250" Height="50"/>
+            <Button Name="Generate2" Content="Generuj drugi wykres" FontSize="20" HorizontalAlignment="Left" Margin="988,292,0,0" VerticalAlignment="Top" Width="250" Height="50"/>
             <Button Name="Add" Click="Add_Click" Content="Dodaj sygnały" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="439,960,0,0" VerticalAlignment="Top" Width="151"/>
             <Button Name="Substract" Click="Substract_Click" Content="Odejmij sygnały" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="668,960,0,0" VerticalAlignment="Top" Width="151"/>
             <Button Name="Multiply" Click="Multiply_Click" Content="Pomnóż sygnały" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="910,960,0,0" VerticalAlignment="Top" Width="150"/>
