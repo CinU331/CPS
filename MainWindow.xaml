@@ -28,34 +28,41 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1092,75,0,0" TextWrapping="Wrap" Text="Amplituda:" VerticalAlignment="Top" Width="117"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1297,75,0,0" TextWrapping="Wrap" Text="Czas początkowy:" VerticalAlignment="Top" Width="190"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="541,200,0,0" TextWrapping="Wrap" Text="Czas trwania sygnału:" VerticalAlignment="Top"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="831,200,0,0" TextWrapping="Wrap" Text="Okres podstawowy:" VerticalAlignment="Top" RenderTransformOrigin="-0.262,0.439"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1092,200,0,0" TextWrapping="Wrap" Text="Wsp. wypełnienia:" VerticalAlignment="Top" Width="161"/>
-            <TextBlock Name="SamplingFrequencyText" FontSize="20" HorizontalAlignment="Left" Margin="541,75,0,0" TextWrapping="Wrap" Text="Częstotliwość próbkowania:" VerticalAlignment="Top" Width="325"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="831,75,0,0" TextWrapping="Wrap" Text="Liczba przedziałów:" VerticalAlignment="Top" Width="221"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1297,200,0,0" TextWrapping="Wrap" Text="Prawdopodobieństwo:" VerticalAlignment="Top" Width="204"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="938,75,0,0" TextWrapping="Wrap" Text="Amplituda:" VerticalAlignment="Top" Width="117"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1123,75,0,0" TextWrapping="Wrap" Text="Czas początkowy:" VerticalAlignment="Top" Width="190"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="457,199,0,0" TextWrapping="Wrap" Text="Czas trwania sygnału:" VerticalAlignment="Top"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="735,199,0,0" TextWrapping="Wrap" Text="Okres podstawowy:" VerticalAlignment="Top" RenderTransformOrigin="-0.262,0.439"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="938,199,0,0" TextWrapping="Wrap" Text="Wsp. wypełnienia:" VerticalAlignment="Top" Width="161"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="457,75,0,0" TextWrapping="Wrap" Text="Częstotliwość próbkowania:" VerticalAlignment="Top" Width="325"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="735,75,0,0" TextWrapping="Wrap" Text="Liczba przedziałów:" VerticalAlignment="Top" Width="221"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1123,199,0,0" TextWrapping="Wrap" Text="Prawdopodobieństwo:" VerticalAlignment="Top" Width="204"/>
+            <TextBlock Name="NthSampleText" FontSize="20" HorizontalAlignment="Left" Margin="1342,75,-2,0" TextWrapping="Wrap" Text="Co którą próbkę:" VerticalAlignment="Top" Width="204"/>
+            <TextBlock Name="QuantizationLevelsText" FontSize="20" HorizontalAlignment="Left" Margin="1342,199,-2,0" TextWrapping="Wrap" Text="Poziomy kwantyzacji:" VerticalAlignment="Top" Width="204"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="457,548,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="144"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="635,548,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="150"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="869,548,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="75"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1039,548,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="105"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1217,548,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120"/>
-            <TextBox Name="Amplitude" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1092,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
-            <TextBox Name="StartTime" Text ="-10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1297,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55"/>
-            <TextBox Name="Duration" Text ="20" FontSize="20" HorizontalAlignment="Left" Height="37" Margin="541,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="51"/>
-            <TextBox Name="BasicPeriod" Text ="2" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="831,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
-            <TextBox Name="FillFactor" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1092,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
-            <TextBox Name="SamplingFrequency" Text ="16" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="541,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
-            <TextBox Name="NumberOfCompartments" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="831,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
-            <TextBox Name="Probability" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1297,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
+            <TextBox Name="Amplitude" Text ="1" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+            <TextBox Name="StartTime" Text ="-5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1123,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55"/>
+            <TextBox Name="Duration" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="37" Margin="457,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="51"/>
+            <TextBox Name="BasicPeriod" Text ="2" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
+            <TextBox Name="FillFactor" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+            <TextBox Name="SamplingFrequency" Text ="512" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="457,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox Name="NumberOfCompartments" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
+            <TextBox Name="Probability" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1123,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
+            <TextBox Name="NthSample" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1342,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
+            <TextBox Name="QuantizationLevels" Text ="8" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1342,224,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
             <TextBox Name="Average" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="457,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <TextBox Name="AbsoluteMean" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="635,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
             <TextBox Name="AveragePower" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="869,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <TextBox Name="Variance" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="1039,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
             <TextBox Name="EffectiveValue" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="1217,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
-            <Button Name="Generate" Click="Generate_Click" Content="Generuj pierwszy wykres" FontSize="20" HorizontalAlignment="Left" Margin="668,292,0,0" VerticalAlignment="Top" Width="250" Height="50"/>
-            <Button Name="Generate2" Content="Generuj drugi wykres" FontSize="20" HorizontalAlignment="Left" Margin="988,292,0,0" VerticalAlignment="Top" Width="250" Height="50"/>
+            <Button Name="Generate" Click="Generate_Click" Content="Generuj pierwszy wykres" FontSize="20" HorizontalAlignment="Left" Margin="461,285,0,0" VerticalAlignment="Top" Width="230" Height="50"/>
+            <Button Name="Generate2" Click="Generate2_Click" Content="Generuj drugi wykres" FontSize="20" HorizontalAlignment="Left" Margin="735,285,0,0" VerticalAlignment="Top" Width="230" Height="50"/>
+            <Button Name="Sampling" Click="Sample_Click" Content="Próbkowanie" FontSize="20" HorizontalAlignment="Left" Margin="1014,285,0,0" VerticalAlignment="Top" Width="130" Height="50"/>
+            <Button Name="Quantization" Click="Quantization_Click" Content="Kwantyzacja" FontSize="20" HorizontalAlignment="Left" Margin="1197,285,0,0" VerticalAlignment="Top" Width="130" Height="50" RenderTransformOrigin="0.111,0.44"/>
+            <Button Name="Reconstruction" Click="Reconstruction_Click"  Content="Rekonstrukcja" FontSize="20" HorizontalAlignment="Left" Margin="1374,285,0,0" VerticalAlignment="Top" Width="130" Height="50"/>
             <Button Name="Add" Click="Add_Click" Content="Dodaj sygnały" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="439,960,0,0" VerticalAlignment="Top" Width="151"/>
             <Button Name="Substract" Click="Substract_Click" Content="Odejmij sygnały" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="668,960,0,0" VerticalAlignment="Top" Width="151"/>
             <Button Name="Multiply" Click="Multiply_Click" Content="Pomnóż sygnały" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="910,960,0,0" VerticalAlignment="Top" Width="150"/>
@@ -94,8 +101,8 @@
             <Button Name="LoadResult" Content="Wczytaj" Click="LoadResult_Click" FontSize="20" HorizontalAlignment="Left" Margin="1396,219,0,0" VerticalAlignment="Top" Width="76" Grid.Row="1"/>
             <Button Name="SaveResult" Content="Zapisz" Click="SaveResult_Click" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="1396,265,0,0" VerticalAlignment="Top" Width="76" Grid.Row="1"/>
             <ComboBox Name="Exercises" HorizontalAlignment="Left" Margin="781,12,0,0" VerticalAlignment="Top" Width="511" FontSize="25" SelectionChanged="Exercise_SelectionChanged">
-                <ComboBoxItem IsSelected="True">Zadanie 1 - Generacja sygnału i szumu</ComboBoxItem>
-                <ComboBoxItem>Zadanie 2 - Próbkowanie i kwantyzacja</ComboBoxItem>
+                <ComboBoxItem>Zadanie 1 - Generacja sygnału i szumu</ComboBoxItem>
+                <ComboBoxItem IsSelected="True">Zadanie 2 - Próbkowanie i kwantyzacja</ComboBoxItem>
             </ComboBox>
         </Grid>
     </ScrollViewer>

@@ -25,6 +25,9 @@ namespace CPS
         private double probability;
         private int selectedId;
         private double time;
+        private double timeBetweenSamples;
+        private int nthSample;
+        private int quantizationLevels;
 
         private List<SignalAndNoise> SignalsAndNoises;
         private OxyPlotModel plot1;
@@ -36,11 +39,12 @@ namespace CPS
         private LineSeries seriesPoints;
         private LineSeries originalSignalPoints;
         private ScatterSeries scatterSeries;
-        private List<KeyValuePair<double, double>> values;
+        private List<KeyValuePair<double, double>> values1;
         private List<KeyValuePair<double, double>> values2;
         private List<KeyValuePair<double, double>> result;
         private List<KeyValuePair<double, double>> sampledValues;
         private List<KeyValuePair<double, double>> quantizedValues;
+        private List<KeyValuePair<double, double>> reconstructedValues;
         private double[] tmpForRand;
         private bool firstPlotExist;
         private bool secondPlotExist;
@@ -171,7 +175,7 @@ namespace CPS
             plot.PlotModel.Axes.Clear();
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             double yValue;
-            double step = 1 / samplingFrequency;
+            timeBetweenSamples = 1 / samplingFrequency;
             originalSignalPoints = new LineSeries();
             double endTime = startTime + duration;
             if (type == "load")
@@ -191,7 +195,7 @@ namespace CPS
 
             if (selectedId == 1 || selectedId == 2)
             {
-                for (double i = startTime; i <= endTime; i += step)
+                for (double i = startTime; i <= endTime; i += timeBetweenSamples)
                 {
                     yValue = (double)method.Invoke(this, new object[] { random, -amplitude, amplitude });
                     originalSignalPoints.Points.Add(new DataPoint(i, yValue));
@@ -202,7 +206,7 @@ namespace CPS
             else if (selectedId >= 3 && selectedId <= 5)
             {
                 int n = 1;
-                for (double i = startTime; i <= endTime; i += step, n++)
+                for (double i = startTime; i <= endTime; i += timeBetweenSamples, n++)
                 {
                     yValue = (double)method.Invoke(this, new object[] { n });
                     originalSignalPoints.Points.Add(new DataPoint(i, yValue));
@@ -214,7 +218,7 @@ namespace CPS
             {
                 double k = 0;
                 int n = 1, tmp = 1;
-                for (double i = startTime; i <= endTime; i += step, n++)
+                for (double i = startTime; i <= endTime; i += timeBetweenSamples, n++)
                 {
                     yValue = (double)method.Invoke(this, new object[] { n, k });
                     originalSignalPoints.Points.Add(new DataPoint(i, yValue));
@@ -229,7 +233,7 @@ namespace CPS
             }
             else if (selectedId == 9)
             {
-                for (double i = startTime; i <= endTime; i += step)
+                for (double i = startTime; i <= endTime; i += timeBetweenSamples)
                 {
                     yValue = (double)method.Invoke(this, new object[] { i });
                     originalSignalPoints.Points.Add(new DataPoint(i, yValue));
@@ -240,7 +244,7 @@ namespace CPS
             else if (selectedId == 10)
             {
                 scatterSeries = new ScatterSeries() { MarkerSize = 2 };
-                for (double i = startTime; i <= endTime; i += step)
+                for (double i = startTime; i <= endTime; i += timeBetweenSamples)
                 {
                     yValue = (double)method.Invoke(this, new object[] { i });
                     scatterSeries.Points.Add(new DataPoint(i, yValue));
@@ -260,7 +264,7 @@ namespace CPS
                         tmpForRand[i] = 0;
                 }
                 scatterSeries = new ScatterSeries() { MarkerSize = 2 };
-                for (double i = startTime; i <= endTime; i += step)
+                for (double i = startTime; i <= endTime; i += timeBetweenSamples)
                 {
                     yValue = (double)method.Invoke(this, new object[] { random });
                     scatterSeries.Points.Add(new DataPoint(i, yValue));
@@ -342,7 +346,7 @@ namespace CPS
         }
         private void GenerateSampledSignal(OxyPlotModel plot, List<KeyValuePair<double, double>> values)
         {
-            int nSample = (int)samplingFrequency;
+            int nSample = (int)nthSample;
             sampledValues = new List<KeyValuePair<double, double>>();
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
@@ -361,17 +365,17 @@ namespace CPS
         {
             double yMin = sampledValues.OrderBy(s => s.Value).First().Value;
             double yMax = sampledValues.OrderBy(s => s.Value).Last().Value;
-            double step = Math.Abs(yMax - yMin) / samplingFrequency;
+            double step = Math.Abs(yMax - yMin) / quantizationLevels;
             List<double> levelsOfQuantization = new List<double>();
-            for (int i = 0; i < samplingFrequency; i++)
+            for (int i = 0; i < quantizationLevels; i++)
                 levelsOfQuantization.Add(yMin + i * step);
             quantizedValues = new List<KeyValuePair<double, double>>();
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Title = "Po kwantyzacji (czarny), oryginalny sygnał (zielony)";
+            plot.PlotModel.Title = "Po kwantyzacji";
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
-            seriesPoints = new LineSeries() { Color = OxyColors.Black };
+            seriesPoints = new LineSeries();
             for (int i = 0; i < values.Count; i++)
             {
                 double nearest = levelsOfQuantization.TakeWhile(p => p <= values[i].Value).LastOrDefault();
@@ -379,7 +383,45 @@ namespace CPS
                 quantizedValues.Add(new KeyValuePair<double, double>(values[i].Key, nearest));
             }
             plot.PlotModel.Series.Add(seriesPoints);
+        }
+        private void GenerateReconstructedSignal(OxyPlotModel plot, List<KeyValuePair<double, double>> values)
+        {
+            reconstructedValues = new List<KeyValuePair<double, double>>();
+            plot.PlotModel = new PlotModel();
+            plot.PlotModel.Axes.Clear();
+            plot.PlotModel.Title = "Po rekonstrukcji (czarny), oryginalny sygnał (zielony)";
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
+            seriesPoints = new LineSeries() { Color = OxyColors.Black };
+            double T_s = Math.Abs(sampledValues[0].Key - sampledValues[1].Key);
+            double yValue, sinc;
+            for (double i = startTime; i <= startTime + duration; i += T_s)
+            {
+                yValue = 0;
+                for (int n = 0; n < values.Count; n++)
+                {
+                    sinc = Sinc((i / T_s) - n);
+                    yValue += values[n].Value * sinc;
+                }
+                seriesPoints.Points.Add(new DataPoint(i, yValue));
+                reconstructedValues.Add(new KeyValuePair<double, double>(i, yValue));
+            }
+            plot.PlotModel.Series.Add(seriesPoints);
             plot.PlotModel.Series.Add(originalSignalPoints);
+        }
+
+        private double SincReconstruction(List<double> sampledY, double time, double frequency)
+        {
+            double result = 0;
+
+            double T_s = 1 / frequency;
+
+            for (int n = 0; n < sampledY.Count(); n++)
+            {
+                result += sampledY[n] * Sinc(time / T_s - n);
+            }
+
+            return result;
         }
         #endregion
         #region CalculateParameters
@@ -451,10 +493,10 @@ namespace CPS
         private void Generate_Click(object sender, RoutedEventArgs e)
         {
             SetParametersFromTextBox();
-            values = new List<KeyValuePair<double, double>>();
-            GeneratePlot(plot1, "Signal" + selectedId.ToString(), values);
-            GenerateHistogram(histogram1, values);
-            CalculateParameters(values, 1);
+            values1 = new List<KeyValuePair<double, double>>();
+            GeneratePlot(plot1, "Signal" + selectedId.ToString(), values1);
+            GenerateHistogram(histogram1, values1);
+            CalculateParameters(values1, 1);
             firstPlotExist = true;
             Save1.IsEnabled = true;
             if (secondPlotExist)
@@ -484,11 +526,11 @@ namespace CPS
         }
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
+            if (values1.Count == values2.Count && values1[0].Key == values2[0].Key && values1[values1.Count - 1].Key == values2[values2.Count - 1].Key)
             {
                 result = new List<KeyValuePair<double, double>>();
-                for (int i = 0; i < values.Count; i++)
-                    result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value + values2[i].Value));
+                for (int i = 0; i < values1.Count; i++)
+                    result.Insert(i, new KeyValuePair<double, double>(values1[i].Key, values1[i].Value + values2[i].Value));
                 GenerateResultPlot(resultPlot, result);
                 GenerateHistogram(resultHistogram, result);
                 CalculateParameters(result, 3);
@@ -499,11 +541,11 @@ namespace CPS
         }
         private void Substract_Click(object sender, RoutedEventArgs e)
         {
-            if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
+            if (values1.Count == values2.Count && values1[0].Key == values2[0].Key && values1[values1.Count - 1].Key == values2[values2.Count - 1].Key)
             {
                 result = new List<KeyValuePair<double, double>>();
-                for (int i = 0; i < values.Count; i++)
-                    result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value - values2[i].Value));
+                for (int i = 0; i < values1.Count; i++)
+                    result.Insert(i, new KeyValuePair<double, double>(values1[i].Key, values1[i].Value - values2[i].Value));
                 GenerateResultPlot(resultPlot, result);
                 GenerateHistogram(resultHistogram, result);
                 CalculateParameters(result, 3);
@@ -514,11 +556,11 @@ namespace CPS
         }
         private void Multiply_Click(object sender, RoutedEventArgs e)
         {
-            if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
+            if (values1.Count == values2.Count && values1[0].Key == values2[0].Key && values1[values1.Count - 1].Key == values2[values2.Count - 1].Key)
             {
                 result = new List<KeyValuePair<double, double>>();
-                for (int i = 0; i < values.Count; i++)
-                    result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value * values2[i].Value));
+                for (int i = 0; i < values1.Count; i++)
+                    result.Insert(i, new KeyValuePair<double, double>(values1[i].Key, values1[i].Value * values2[i].Value));
                 GenerateResultPlot(resultPlot, result);
                 GenerateHistogram(resultHistogram, result);
                 CalculateParameters(result, 3);
@@ -529,14 +571,14 @@ namespace CPS
         }
         private void Divide_Click(object sender, RoutedEventArgs e)
         {
-            if (values.Count == values2.Count && values[0].Key == values2[0].Key && values[values.Count - 1].Key == values2[values2.Count - 1].Key)
+            if (values1.Count == values2.Count && values1[0].Key == values2[0].Key && values1[values1.Count - 1].Key == values2[values2.Count - 1].Key)
             {
                 result = new List<KeyValuePair<double, double>>();
-                for (int i = 0; i < values.Count; i++)
+                for (int i = 0; i < values1.Count; i++)
                 {
                     if (values2[i].Value == 0)
                         values2[i] = new KeyValuePair<double, double>(values2[i].Key, 0.000000001);
-                    result.Insert(i, new KeyValuePair<double, double>(values[i].Key, values[i].Value / values2[i].Value));
+                    result.Insert(i, new KeyValuePair<double, double>(values1[i].Key, values1[i].Value / values2[i].Value));
                 }
                 GenerateResultPlot(resultPlot, result);
                 GenerateHistogram(resultHistogram, result);
@@ -551,10 +593,10 @@ namespace CPS
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
-                LoadFromBinFile(openFileDialog.FileName, ref values);
-            GeneratePlot(plot1, "load", values);
-            GenerateHistogram(histogram1, values);
-            CalculateParameters(values, 1);
+                LoadFromBinFile(openFileDialog.FileName, ref values1);
+            GeneratePlot(plot1, "load", values1);
+            GenerateHistogram(histogram1, values1);
+            CalculateParameters(values1, 1);
             firstPlotExist = true;
             Save1.IsEnabled = true;
             if (secondPlotExist)
@@ -569,7 +611,7 @@ namespace CPS
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             if (saveFileDialog.ShowDialog() == true)
-                SaveToBinFile(saveFileDialog.FileName, values);
+                SaveToBinFile(saveFileDialog.FileName, values1);
         }
         private void Load2_Click(object sender, RoutedEventArgs e)
         {
@@ -771,48 +813,56 @@ namespace CPS
             switch (selectedExercise)
             {
                 case 0:
-                    Generate2.Content = "Generuj drugi wykres";
-                    Generate2.Click += Generate2_Click;
-                    Generate2.Click -= Sample_Click;
-                    SamplingFrequencyText.Text = "Częstotliwość próbkowania:";
+                    NthSample.Visibility = Visibility.Hidden;
+                    NthSampleText.Visibility = Visibility.Hidden;
+                    QuantizationLevels.Visibility = Visibility.Hidden;
+                    QuantizationLevelsText.Visibility = Visibility.Hidden;
+                    Sampling.Visibility = Visibility.Hidden;
+                    Quantization.Visibility = Visibility.Hidden;
+                    Reconstruction.Visibility = Visibility.Hidden;
                     break;
                 case 1:
-                    Generate2.Content = "Próbkowanie";
-                    Generate2.Click -= Generate2_Click;
-                    Generate2.Click += Sample_Click;
-                    SamplingFrequencyText.Text = "Próbkuj co ile próbek:";
+                    NthSample.Visibility = Visibility.Visible;
+                    NthSampleText.Visibility = Visibility.Visible;
+                    QuantizationLevels.Visibility = Visibility.Visible;
+                    QuantizationLevelsText.Visibility = Visibility.Visible;
+                    Sampling.Visibility = Visibility.Visible;
+                    Quantization.Visibility = Visibility.Visible;
+                    Reconstruction.Visibility = Visibility.Visible;
                     break;
             }
         }
-
         private void Sample_Click(object sender, RoutedEventArgs e)
         {
             if (firstPlotExist)
             {
-                if (SamplingFrequency.Text != "")
-                    samplingFrequency = double.Parse(SamplingFrequency.Text);
-                GenerateSampledSignal(plot2, values);
+                if (NthSample.Text != "")
+                    nthSample = int.Parse(NthSample.Text);
+                GenerateSampledSignal(plot2, values1);
                 GenerateHistogram(histogram2, sampledValues);
                 CalculateParameters(sampledValues, 2);
-                PrepareForQuantization();
             }
         }
-
-        private void PrepareForQuantization()
-        {
-            SamplingFrequencyText.Text = "Liczba poziomów kwantyzacji:";
-            Generate2.Content = "Kwantyzacja";
-            Generate2.Click -= Sample_Click;
-            Generate2.Click += Quantization_Click;
-        }
-
         private void Quantization_Click(object sender, RoutedEventArgs e)
         {
-            if (SamplingFrequency.Text != "")
-                samplingFrequency = double.Parse(SamplingFrequency.Text);
+            if (QuantizationLevels.Text != "")
+                quantizationLevels = int.Parse(QuantizationLevels.Text);
             GenerateQuantizedSignal(plot2, sampledValues);
             GenerateHistogram(histogram2, quantizedValues);
             CalculateParameters(quantizedValues, 2);
+        }
+        private double Sinc(double t)
+        {
+            if (t == 0)
+                return 1;
+            else
+                return (Math.Sin(Math.PI * t)) / (Math.PI * t);
+        }
+        private void Reconstruction_Click(object sender, RoutedEventArgs e)
+        {
+            GenerateReconstructedSignal(plot1, sampledValues);
+            GenerateHistogram(histogram1, reconstructedValues);
+            CalculateParameters(reconstructedValues, 1);
         }
     }
 }
