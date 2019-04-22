@@ -38,26 +38,28 @@
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1123,199,0,0" TextWrapping="Wrap" Text="Prawdopodobieństwo:" VerticalAlignment="Top" Width="204"/>
             <TextBlock Name="NthSampleText" FontSize="20" HorizontalAlignment="Left" Margin="1342,75,-2,0" TextWrapping="Wrap" Text="Co którą próbkę:" VerticalAlignment="Top" Width="204"/>
             <TextBlock Name="QuantizationLevelsText" FontSize="20" HorizontalAlignment="Left" Margin="1342,199,-2,0" TextWrapping="Wrap" Text="Poziomy kwantyzacji:" VerticalAlignment="Top" Width="204"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="457,548,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="144"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="635,548,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="150"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="869,548,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="75"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1039,548,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="105"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1217,548,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120"/>
-            <TextBox Name="Amplitude" Text ="1" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
-            <TextBox Name="StartTime" Text ="-5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1123,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55"/>
-            <TextBox Name="Duration" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="37" Margin="457,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="51"/>
-            <TextBox Name="BasicPeriod" Text ="2" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="439,550,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="144"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="617,550,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="150"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="805,548,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="75"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="938,550,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="105"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1103,550,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120"/>
+            <TextBlock Name="MseText" FontSize="20" HorizontalAlignment="Left" Margin="1270,550,0,0" TextWrapping="Wrap" Text="MSE:" VerticalAlignment="Top" Width="120"/>
+            <TextBox Name="Amplitude" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
+            <TextBox Name="StartTime" Text ="0" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1123,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55"/>
+            <TextBox Name="Duration" Text ="4" FontSize="20" HorizontalAlignment="Left" Height="37" Margin="457,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="51"/>
+            <TextBox Name="BasicPeriod" Text ="1" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
             <TextBox Name="FillFactor" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
             <TextBox Name="SamplingFrequency" Text ="512" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="457,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <TextBox Name="NumberOfCompartments" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
             <TextBox Name="Probability" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1123,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
-            <TextBox Name="NthSample" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1342,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
+            <TextBox Name="NthSample" Text ="2" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1342,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
             <TextBox Name="QuantizationLevels" Text ="8" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1342,224,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
-            <TextBox Name="Average" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="457,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
-            <TextBox Name="AbsoluteMean" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="635,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
-            <TextBox Name="AveragePower" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="869,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
-            <TextBox Name="Variance" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="1039,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
-            <TextBox Name="EffectiveValue" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="1217,601,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox Name="Average" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="439,602,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox Name="AbsoluteMean" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="617,602,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
+            <TextBox Name="AveragePower" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="805,600,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox Name="Variance" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="938,602,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
+            <TextBox Name="EffectiveValue" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="1103,602,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox Name="Mse" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="1270,602,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <Button Name="Generate" Click="Generate_Click" Content="Generuj pierwszy wykres" FontSize="20" HorizontalAlignment="Left" Margin="461,285,0,0" VerticalAlignment="Top" Width="230" Height="50"/>
             <Button Name="Generate2" Click="Generate2_Click" Content="Generuj drugi wykres" FontSize="20" HorizontalAlignment="Left" Margin="735,285,0,0" VerticalAlignment="Top" Width="230" Height="50"/>
             <Button Name="Sampling" Click="Sample_Click" Content="Próbkowanie" FontSize="20" HorizontalAlignment="Left" Margin="1014,285,0,0" VerticalAlignment="Top" Width="130" Height="50"/>
@@ -73,26 +75,26 @@
             <oxy:Plot x:Name="Histogram1" Model="{Binding HistogramModel}" Margin="39,362,1153,0" VerticalAlignment="Top" Height="274"/>
             <oxy:Plot x:Name="Histogram2" Model="{Binding HistogramModel}" Margin="39,661,1153,0" VerticalAlignment="Top" Height="274"/>
             <oxy:Plot x:Name="ResultHistogram" Model="{Binding HistogramModel}" Margin="39,1020,1153,-18" VerticalAlignment="Top" Height="267" Grid.RowSpan="2"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="457,847,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="144"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="635,847,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="150"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="869,847,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="75"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1039,847,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="105"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1217,847,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120"/>
-            <TextBox x:Name="Average2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="457,899,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
-            <TextBox x:Name="AbsoluteMean2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="635,899,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="AveragePower2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="869,899,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
-            <TextBox x:Name="Variance2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1039,899,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="EffectiveValue2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1217,899,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="457,208,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="144" Grid.Row="1"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="635,208,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="150" Grid.Row="1"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="869,208,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1039,208,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="105" Grid.Row="1"/>
-            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1217,208,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120" Grid.Row="1"/>
-            <TextBox x:Name="ResultAverage" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="457,260,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
-            <TextBox x:Name="ResultAbsoluteMean" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="635,260,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74" Grid.Row="1"/>
-            <TextBox x:Name="ResultAveragePower" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="869,260,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
-            <TextBox x:Name="ResultVariance" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1039,260,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74" Grid.Row="1"/>
-            <TextBox x:Name="ResultEffectiveValue" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1217,260,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="439,849,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="144"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="617,849,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="150"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="805,847,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="75"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="938,849,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="105"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1103,849,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120"/>
+            <TextBox x:Name="Average2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="439,901,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox x:Name="AbsoluteMean2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="617,901,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
+            <TextBox x:Name="AveragePower2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="805,899,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox x:Name="Variance2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,901,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
+            <TextBox x:Name="EffectiveValue2" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1103,901,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="439,209.6,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="144" Grid.Row="1"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="617,209.6,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="150" Grid.Row="1"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="805,207.6,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="938,209.6,0,0" TextWrapping="Wrap" Text="Wariancja:" VerticalAlignment="Top" Width="105" Grid.Row="1"/>
+            <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1103,209.6,0,0" TextWrapping="Wrap" Text="Wartość skuteczna:" VerticalAlignment="Top" Width="120" Grid.Row="1"/>
+            <TextBox x:Name="ResultAverage" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="439,261.6,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
+            <TextBox x:Name="ResultAbsoluteMean" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="617,261.6,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74" Grid.Row="1"/>
+            <TextBox x:Name="ResultAveragePower" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="805,259.6,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
+            <TextBox x:Name="ResultVariance" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,261.6,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74" Grid.Row="1"/>
+            <TextBox x:Name="ResultEffectiveValue" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1103,261.6,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Grid.Row="1"/>
             <TextBlock HorizontalAlignment="Left" Margin="413,328,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Height="19" Width="1088"/>
             <Button Name="Load1" Content="Wczytaj" Click="Load1_Click" FontSize="20" HorizontalAlignment="Left" Margin="1396,559,0,0" VerticalAlignment="Top" Width="76"/>
             <Button Name="Save1" Content="Zapisz" Click="Save1_Click" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="1396,605,0,0" VerticalAlignment="Top" Width="76"/>

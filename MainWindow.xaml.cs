@@ -81,6 +81,7 @@ namespace CPS
                 new SignalAndNoise() { Name = "Szum jednostkowy", Id = 11 }
             };
             ListOfSignalsAndNoises.ItemsSource = SignalsAndNoises;
+            ListOfSignalsAndNoises.SelectedIndex = 2;
         }
 
         #region SignalsEquation
@@ -88,7 +89,6 @@ namespace CPS
         {
             return random.NextDouble() * (maximum - minimum) + minimum;
         }
-
         public double Signal2(Random random, double minimum, double maximum)
         {
             int n = 10;
@@ -97,22 +97,18 @@ namespace CPS
                 x += Signal1(random, minimum, maximum);
             return x * Math.Sqrt(1 / (double)n);
         }
-
         public double Signal3(int n)
         {
             return amplitude * Math.Sin((2 * Math.PI * (n / samplingFrequency - startTime)) / basicPeriod);
         }
-
         public double Signal4(int n)
         {
             return 0.5 * amplitude * ((Math.Sin((2 * Math.PI * (n / samplingFrequency - startTime)) / basicPeriod)) + Math.Abs(Math.Sin((2 * Math.PI * (n / samplingFrequency - startTime)) / basicPeriod)));
         }
-
         public double Signal5(int n)
         {
             return amplitude * (Math.Abs(Math.Sin((2 * Math.PI * (n / samplingFrequency - startTime)) / basicPeriod)));
         }
-
         public double Signal6(int n, double k)
         {
             time = startTime + (n / samplingFrequency);
@@ -122,7 +118,6 @@ namespace CPS
                 return 0;
             else return 1;
         }
-
         public double Signal7(int n, double k)
         {
             time = startTime + (n / samplingFrequency);
@@ -132,7 +127,6 @@ namespace CPS
                 return -amplitude;
             else return 1;
         }
-
         public double Signal8(int n, double k)
         {
             time = startTime + (n / samplingFrequency);
@@ -142,7 +136,6 @@ namespace CPS
                 return (-amplitude * (time - (k * basicPeriod) - startTime) / (basicPeriod - (basicPeriod * fillFactor))) + (amplitude / (1 - fillFactor));
             else return 1;
         }
-
         public double Signal9(double time)
         {
             if (time > 0)
@@ -152,18 +145,25 @@ namespace CPS
             else
                 return 0;
         }
-
         public double Signal10(double time)
         {
             if (time == 0)
                 return 1;
             else return 0;
         }
-
         public double Signal11(Random random)
         {
             int index = random.Next(100);
             return tmpForRand[index];
+        }
+
+
+        private double Sinc(double t)
+        {
+            if (t == 0)
+                return 1;
+            else
+                return (Math.Sin(Math.PI * t)) / (Math.PI * t);
         }
         #endregion
         #region GeneratingPlots
@@ -389,11 +389,11 @@ namespace CPS
             reconstructedValues = new List<KeyValuePair<double, double>>();
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Title = "Po rekonstrukcji (czarny), oryginalny sygnał (zielony)";
+            plot.PlotModel.Title = "Po rekonstrukcji";
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             seriesPoints = new LineSeries() { Color = OxyColors.Black };
-            double T_s = Math.Abs(sampledValues[0].Key - sampledValues[1].Key);
+            double T_s = Math.Abs(quantizedValues[0].Key - quantizedValues[1].Key);
             double yValue, sinc;
             for (double i = startTime; i <= startTime + duration; i += T_s)
             {
@@ -407,21 +407,7 @@ namespace CPS
                 reconstructedValues.Add(new KeyValuePair<double, double>(i, yValue));
             }
             plot.PlotModel.Series.Add(seriesPoints);
-            plot.PlotModel.Series.Add(originalSignalPoints);
-        }
-
-        private double SincReconstruction(List<double> sampledY, double time, double frequency)
-        {
-            double result = 0;
-
-            double T_s = 1 / frequency;
-
-            for (int n = 0; n < sampledY.Count(); n++)
-            {
-                result += sampledY[n] * Sinc(time / T_s - n);
-            }
-
-            return result;
+            //plot.PlotModel.Series.Add(originalSignalPoints);
         }
         #endregion
         #region CalculateParameters
@@ -487,6 +473,19 @@ namespace CPS
                 ResultVariance.Text = variance.ToString();
                 ResultEffectiveValue.Text = effectiveValue.ToString();
             }
+        }
+        private void CalculateMeanSquaredError()
+        {
+            int N = reconstructedValues.Count;
+            double sum = 0;
+
+            for (int i = 0; i < N; i++)
+            {
+                sum += Math.Pow(values1[i].Value - reconstructedValues[i].Value, 2);
+            }
+
+            double result = (1.0 / N) * sum;
+            Mse.Text = result.ToString();
         }
         #endregion
         #region ButtonsOnClick
@@ -653,6 +652,61 @@ namespace CPS
             if (saveFileDialog.ShowDialog() == true)
                 SaveToBinFile(saveFileDialog.FileName, result);
         }
+        private void Sample_Click(object sender, RoutedEventArgs e)
+        {
+            if (firstPlotExist)
+            {
+                if (NthSample.Text != "")
+                    nthSample = int.Parse(NthSample.Text);
+                GenerateSampledSignal(plot2, values1);
+                GenerateHistogram(histogram2, sampledValues);
+                CalculateParameters(sampledValues, 2);
+            }
+        }
+        private void Quantization_Click(object sender, RoutedEventArgs e)
+        {
+            if (QuantizationLevels.Text != "")
+                quantizationLevels = int.Parse(QuantizationLevels.Text);
+            GenerateQuantizedSignal(plot2, sampledValues);
+            GenerateHistogram(histogram2, quantizedValues);
+            CalculateParameters(quantizedValues, 2);
+        }
+        private void Reconstruction_Click(object sender, RoutedEventArgs e)
+        {
+            GenerateReconstructedSignal(plot2, quantizedValues);
+            GenerateHistogram(histogram2, reconstructedValues);
+            CalculateParameters(reconstructedValues, 2);
+            CalculateMeanSquaredError();
+        }
+        private void Exercise_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedExercise = Exercises.SelectedIndex;
+            switch (selectedExercise)
+            {
+                case 0:
+                    NthSample.Visibility = Visibility.Hidden;
+                    NthSampleText.Visibility = Visibility.Hidden;
+                    QuantizationLevels.Visibility = Visibility.Hidden;
+                    QuantizationLevelsText.Visibility = Visibility.Hidden;
+                    Sampling.Visibility = Visibility.Hidden;
+                    Quantization.Visibility = Visibility.Hidden;
+                    Reconstruction.Visibility = Visibility.Hidden;
+                    MseText.Visibility = Visibility.Hidden;
+                    Mse.Visibility = Visibility.Hidden;
+                    break;
+                case 1:
+                    NthSample.Visibility = Visibility.Visible;
+                    NthSampleText.Visibility = Visibility.Visible;
+                    QuantizationLevels.Visibility = Visibility.Visible;
+                    QuantizationLevelsText.Visibility = Visibility.Visible;
+                    Sampling.Visibility = Visibility.Visible;
+                    Quantization.Visibility = Visibility.Visible;
+                    Reconstruction.Visibility = Visibility.Visible;
+                    MseText.Visibility = Visibility.Visible;
+                    Mse.Visibility = Visibility.Visible;
+                    break;
+            }
+        }
         #endregion
         #region SetsOfParameters
         private void FirstSetOfParameters()
@@ -806,63 +860,5 @@ namespace CPS
             }
         }
         #endregion
-
-        private void Exercise_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            selectedExercise = Exercises.SelectedIndex;
-            switch (selectedExercise)
-            {
-                case 0:
-                    NthSample.Visibility = Visibility.Hidden;
-                    NthSampleText.Visibility = Visibility.Hidden;
-                    QuantizationLevels.Visibility = Visibility.Hidden;
-                    QuantizationLevelsText.Visibility = Visibility.Hidden;
-                    Sampling.Visibility = Visibility.Hidden;
-                    Quantization.Visibility = Visibility.Hidden;
-                    Reconstruction.Visibility = Visibility.Hidden;
-                    break;
-                case 1:
-                    NthSample.Visibility = Visibility.Visible;
-                    NthSampleText.Visibility = Visibility.Visible;
-                    QuantizationLevels.Visibility = Visibility.Visible;
-                    QuantizationLevelsText.Visibility = Visibility.Visible;
-                    Sampling.Visibility = Visibility.Visible;
-                    Quantization.Visibility = Visibility.Visible;
-                    Reconstruction.Visibility = Visibility.Visible;
-                    break;
-            }
-        }
-        private void Sample_Click(object sender, RoutedEventArgs e)
-        {
-            if (firstPlotExist)
-            {
-                if (NthSample.Text != "")
-                    nthSample = int.Parse(NthSample.Text);
-                GenerateSampledSignal(plot2, values1);
-                GenerateHistogram(histogram2, sampledValues);
-                CalculateParameters(sampledValues, 2);
-            }
-        }
-        private void Quantization_Click(object sender, RoutedEventArgs e)
-        {
-            if (QuantizationLevels.Text != "")
-                quantizationLevels = int.Parse(QuantizationLevels.Text);
-            GenerateQuantizedSignal(plot2, sampledValues);
-            GenerateHistogram(histogram2, quantizedValues);
-            CalculateParameters(quantizedValues, 2);
-        }
-        private double Sinc(double t)
-        {
-            if (t == 0)
-                return 1;
-            else
-                return (Math.Sin(Math.PI * t)) / (Math.PI * t);
-        }
-        private void Reconstruction_Click(object sender, RoutedEventArgs e)
-        {
-            GenerateReconstructedSignal(plot1, sampledValues);
-            GenerateHistogram(histogram1, reconstructedValues);
-            CalculateParameters(reconstructedValues, 1);
-        }
     }
 }
