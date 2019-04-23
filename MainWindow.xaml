@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:oxy="http://oxyplot.codeplex.com"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1380" Width="1550">
+        Title="MainWindow" Height="1300" Width="1550">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
         <Grid>
             <Grid.RowDefinitions>
@@ -37,7 +37,7 @@
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="735,75,0,0" TextWrapping="Wrap" Text="Liczba przedziałów:" VerticalAlignment="Top" Width="221"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="1123,199,0,0" TextWrapping="Wrap" Text="Prawdopodobieństwo:" VerticalAlignment="Top" Width="204"/>
             <TextBlock Name="NthSampleText" FontSize="20" HorizontalAlignment="Left" Margin="1342,75,-2,0" TextWrapping="Wrap" Text="Co którą próbkę:" VerticalAlignment="Top" Width="204"/>
-            <TextBlock Name="QuantizationLevelsText" FontSize="20" HorizontalAlignment="Left" Margin="1342,199,-2,0" TextWrapping="Wrap" Text="Poziomy kwantyzacji:" VerticalAlignment="Top" Width="204"/>
+            <TextBlock Name="QuantizationLevelsText" FontSize="20" HorizontalAlignment="Left" Margin="1342,199,-2,0" TextWrapping="Wrap" Text="Poziomy kwant.:" VerticalAlignment="Top" Width="204"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="439,550,0,0" TextWrapping="Wrap" Text="Wartość średnia:" VerticalAlignment="Top" Width="144"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="617,550,0,0" TextWrapping="Wrap" Text="Wartość średnia bezwzględna:" VerticalAlignment="Top" Width="150"/>
             <TextBlock FontSize="20" HorizontalAlignment="Left" Margin="805,548,0,0" TextWrapping="Wrap" Text="Moc średnia:" VerticalAlignment="Top" Width="75"/>
@@ -46,8 +46,8 @@
             <TextBlock Name="MseText" FontSize="20" HorizontalAlignment="Left" Margin="1270,550,0,0" TextWrapping="Wrap" Text="MSE:" VerticalAlignment="Top" Width="120"/>
             <TextBox Name="Amplitude" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
             <TextBox Name="StartTime" Text ="0" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1123,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55"/>
-            <TextBox Name="Duration" Text ="4" FontSize="20" HorizontalAlignment="Left" Height="37" Margin="457,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="51"/>
-            <TextBox Name="BasicPeriod" Text ="1" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
+            <TextBox Name="Duration" Text ="4" FontSize="20" HorizontalAlignment="Left" Height="37" Margin="457,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
+            <TextBox Name="BasicPeriod" Text ="1" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="145"/>
             <TextBox Name="FillFactor" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="938,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="49"/>
             <TextBox Name="SamplingFrequency" Text ="512" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="457,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <TextBox Name="NumberOfCompartments" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
