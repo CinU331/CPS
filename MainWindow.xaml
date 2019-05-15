@@ -107,6 +107,14 @@
                 <ComboBoxItem>Zadanie 2 - Próbkowanie i kwantyzacja</ComboBoxItem>
                 <ComboBoxItem IsSelected="True">Zadanie 3 - Splot, filtracja i korelacja sygnałów</ComboBoxItem>
             </ComboBox>
+            <ComboBox Name="TypesOfFilter" HorizontalAlignment="Left" Margin="1342,142,0,0" VerticalAlignment="Top" Width="162" FontSize="15" SelectionChanged="TypesOfFilter_SelectionChanged" Height="25">
+                <ComboBoxItem IsSelected="True">Filtr dolnoprzepustowy</ComboBoxItem>
+                <ComboBoxItem>Filtr górnoprzepustowy</ComboBoxItem>
+            </ComboBox>
+            <ComboBox Name="TypesOfWindow" HorizontalAlignment="Left" Margin="1342,172,0,0" VerticalAlignment="Top" Width="162" FontSize="15" SelectionChanged="TypesOfWindow_SelectionChanged" Height="25">
+                <ComboBoxItem IsSelected="True">Okno prostokątne</ComboBoxItem>
+                <ComboBoxItem>Okno Hanninga</ComboBoxItem>
+            </ComboBox>
         </Grid>
     </ScrollViewer>
 </Window>

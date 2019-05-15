@@ -28,6 +28,8 @@ namespace CPS
         private double timeBetweenSamples;
         private int nthSample;
         private int quantizationLevels;
+        private int selectedTypeOfFilter;
+        private int selectedTypeOfWindow;
 
         private List<SignalAndNoise> SignalsAndNoises;
         private OxyPlotModel plot1;
@@ -49,6 +51,7 @@ namespace CPS
         private bool firstPlotExist;
         private bool secondPlotExist;
         private int selectedExercise;
+        private bool changeSelect = false;
 
         private double average;
         private double absoluteMean;
@@ -276,6 +279,8 @@ namespace CPS
         private void GenerateHistogram(Histogram histogram, List<KeyValuePair<double, double>> values)
         {
             List<double> yValues = (from y in values select y.Value).ToList();
+            if (numberOfCompartments == 0)
+                numberOfCompartments = 10;
             double stepForHistogram = (yValues.Max() - yValues.Min()) / numberOfCompartments;
             List<double> compartmentsForHistogram = new List<double>
             {
@@ -738,35 +743,77 @@ namespace CPS
             }
             else if (Reconstruction.Content.Equals("Filtracja"))
             {
-                if (firstPlotExist)
+                int M, N = 256;
+                double K, up, down, tmp;
+                if (NthSample.Text != "")
+                    M = int.Parse(NthSample.Text);
+                else return;
+                if (QuantizationLevels.Text != "")
+                    K = double.Parse(QuantizationLevels.Text);
+                else return;
+                values2 = new List<KeyValuePair<double, double>>();
+                for (int n = 0; n < M; n++)
                 {
-                    int M, N = 256;
-                    double K, up, down;
-                    if (NthSample.Text != "")
-                        M = int.Parse(NthSample.Text);
-                    else return;
-                    if (QuantizationLevels.Text != "")
-                        K = double.Parse(QuantizationLevels.Text);
-                    else return;
-                    values2 = new List<KeyValuePair<double, double>>();
-                    for (int n = 0; n < M; n++)
+                    if (n == (M - 1) / 2)
+                        values2.Insert(n, new KeyValuePair<double, double>(n, 2 / K));
+                    else
                     {
-                        if (n == (M - 1) / 2)
-                            values2.Insert(n, new KeyValuePair<double, double>(n, 2 / K));
-                        else
-                        {
-                            up = Math.Sin((2 * Math.PI * (n - (M - 1) / 2))/K);
-                            down = Math.PI * (n - (M - 1) / 2);
-                            values2.Insert(n, new KeyValuePair<double, double>(n,  up/down));
-                        }
+                        up = Math.Sin((2 * Math.PI * (n - (M - 1) / 2)) / K);
+                        down = Math.PI * (n - (M - 1) / 2);
+                        values2.Insert(n, new KeyValuePair<double, double>(n, up / down));
                     }
-                    for (int i = M; i < N; i++)
-                        values2.Insert(i, new KeyValuePair<double, double>(i, 0));
-                    GenerateResultPlot(plot2, values2);
-                    GenerateHistogram(histogram2, values2);
-                    CalculateParameters(values2, 2);
-                    secondPlotExist = true;
                 }
+                for (int i = M; i < N; i++)
+                    values2.Insert(i, new KeyValuePair<double, double>(i, 0));
+                if (selectedTypeOfWindow == 2)  //okno Hanninga, domyślnie okno prostokątne
+                {
+                    for (int n = 0; n < N; n++)
+                    {
+                        tmp = values2[n].Value;
+                        tmp = tmp * (0.5 - 0.5 * Math.Cos((2 * Math.PI * n) / M));
+                        values2.Insert(N + n, new KeyValuePair<double, double>(n, tmp));
+                    }
+                    values2.RemoveRange(0, N);
+                }
+                if (selectedTypeOfFilter == 2)  //filtr górnoprzepustowy, domyślnie filtr dolnoprzepustowy
+                {
+                    for (int n = 0; n < N; n++)
+                    {
+                        tmp = values2[n].Value;
+                        tmp = tmp * Math.Pow(-1, n);
+                        values2.Insert(N + n, new KeyValuePair<double, double>(n, tmp));
+                    }
+                    values2.RemoveRange(0, N);
+                }
+                GenerateResultPlot(plot1, values2);
+                GenerateHistogram(histogram1, values2);
+                CalculateParameters(values2, 1);
+            }
+        }
+        private void TypesOfFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedTypeOfFilter = TypesOfFilter.SelectedIndex;
+            switch (selectedTypeOfFilter)
+            {
+                case 0:
+                    selectedTypeOfFilter = 1;
+                    break;
+                case 1:
+                    selectedTypeOfFilter = 2;
+                    break;
+            }
+        }
+        private void TypesOfWindow_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedTypeOfWindow = TypesOfWindow.SelectedIndex;
+            switch (selectedTypeOfWindow)
+            {
+                case 0:
+                    selectedTypeOfWindow = 1;
+                    break;
+                case 1:
+                    selectedTypeOfWindow = 2;
+                    break;
             }
         }
         private void Exercise_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -784,6 +831,9 @@ namespace CPS
                     Reconstruction.Visibility = Visibility.Hidden;
                     MseText.Visibility = Visibility.Hidden;
                     Mse.Visibility = Visibility.Hidden;
+                    TypesOfWindow.Visibility = Visibility.Hidden;
+                    TypesOfFilter.Visibility = Visibility.Hidden;
+                    changeSelect = true;
                     break;
                 case 1:
                     NthSample.Visibility = Visibility.Visible;
@@ -800,6 +850,9 @@ namespace CPS
                     Reconstruction.Content = "Rekonstrukcja";
                     MseText.Visibility = Visibility.Visible;
                     Mse.Visibility = Visibility.Visible;
+                    TypesOfWindow.Visibility = Visibility.Hidden;
+                    TypesOfFilter.Visibility = Visibility.Hidden;
+                    changeSelect = true;
                     break;
                 case 2:
                     NthSample.Visibility = Visibility.Visible;
@@ -816,6 +869,11 @@ namespace CPS
                     Reconstruction.Content = "Filtracja";
                     MseText.Visibility = Visibility.Hidden;
                     Mse.Visibility = Visibility.Hidden;
+                    if (changeSelect)
+                    {
+                        TypesOfWindow.Visibility = Visibility.Visible;
+                        TypesOfFilter.Visibility = Visibility.Visible;
+                    }
                     break;
             }
         }
