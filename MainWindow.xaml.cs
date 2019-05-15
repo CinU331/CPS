@@ -334,7 +334,6 @@ namespace CPS
         {
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Title = "Sygnał wynikowy";
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             seriesPoints = new LineSeries();
@@ -350,7 +349,6 @@ namespace CPS
             sampledValues = new List<KeyValuePair<double, double>>();
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Title = "Po próbkowaniu";
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             scatterSeries = new ScatterSeries() { MarkerSize = 2 };
@@ -372,7 +370,6 @@ namespace CPS
             quantizedValues = new List<KeyValuePair<double, double>>();
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Title = "Po kwantyzacji";
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             seriesPoints = new LineSeries();
@@ -389,7 +386,6 @@ namespace CPS
             reconstructedValues = new List<KeyValuePair<double, double>>();
             plot.PlotModel = new PlotModel();
             plot.PlotModel.Axes.Clear();
-            plot.PlotModel.Title = "Po rekonstrukcji";
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "t[s]", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             plot.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Title = "A", AxisTickToLabelDistance = 5, ExtraGridlines = new Double[] { 0 } });
             seriesPoints = new LineSeries() { Color = OxyColors.Black };
@@ -733,10 +729,45 @@ namespace CPS
         }
         private void Reconstruction_Click(object sender, RoutedEventArgs e)
         {
-            GenerateReconstructedSignal(plot2, quantizedValues);
-            GenerateHistogram(histogram2, reconstructedValues);
-            CalculateParameters(reconstructedValues, 2);
-            CalculateMeanSquaredError();
+            if (Reconstruction.Content.Equals("Rekonstrukcja"))
+            {
+                GenerateReconstructedSignal(plot2, quantizedValues);
+                GenerateHistogram(histogram2, reconstructedValues);
+                CalculateParameters(reconstructedValues, 2);
+                CalculateMeanSquaredError();
+            }
+            else if (Reconstruction.Content.Equals("Filtracja"))
+            {
+                if (firstPlotExist)
+                {
+                    int M, N = 256;
+                    double K, up, down;
+                    if (NthSample.Text != "")
+                        M = int.Parse(NthSample.Text);
+                    else return;
+                    if (QuantizationLevels.Text != "")
+                        K = double.Parse(QuantizationLevels.Text);
+                    else return;
+                    values2 = new List<KeyValuePair<double, double>>();
+                    for (int n = 0; n < M; n++)
+                    {
+                        if (n == (M - 1) / 2)
+                            values2.Insert(n, new KeyValuePair<double, double>(n, 2 / K));
+                        else
+                        {
+                            up = Math.Sin((2 * Math.PI * (n - (M - 1) / 2))/K);
+                            down = Math.PI * (n - (M - 1) / 2);
+                            values2.Insert(n, new KeyValuePair<double, double>(n,  up/down));
+                        }
+                    }
+                    for (int i = M; i < N; i++)
+                        values2.Insert(i, new KeyValuePair<double, double>(i, 0));
+                    GenerateResultPlot(plot2, values2);
+                    GenerateHistogram(histogram2, values2);
+                    CalculateParameters(values2, 2);
+                    secondPlotExist = true;
+                }
+            }
         }
         private void Exercise_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -757,26 +788,32 @@ namespace CPS
                 case 1:
                     NthSample.Visibility = Visibility.Visible;
                     NthSampleText.Visibility = Visibility.Visible;
+                    NthSampleText.Text = "Co którą próbkę";
                     QuantizationLevels.Visibility = Visibility.Visible;
                     QuantizationLevelsText.Visibility = Visibility.Visible;
+                    QuantizationLevelsText.Text = "Poziomy kwant.";
                     Sampling.Visibility = Visibility.Visible;
                     Sampling.Content = "Próbkowanie";
                     Quantization.Visibility = Visibility.Visible;
                     Quantization.Content = "Kwantyzacja";
                     Reconstruction.Visibility = Visibility.Visible;
+                    Reconstruction.Content = "Rekonstrukcja";
                     MseText.Visibility = Visibility.Visible;
                     Mse.Visibility = Visibility.Visible;
                     break;
                 case 2:
-                    NthSample.Visibility = Visibility.Hidden;
-                    NthSampleText.Visibility = Visibility.Hidden;
-                    QuantizationLevels.Visibility = Visibility.Hidden;
-                    QuantizationLevelsText.Visibility = Visibility.Hidden;
+                    NthSample.Visibility = Visibility.Visible;
+                    NthSampleText.Visibility = Visibility.Visible;
+                    NthSampleText.Text = "M";
+                    QuantizationLevels.Visibility = Visibility.Visible;
+                    QuantizationLevelsText.Visibility = Visibility.Visible;
+                    QuantizationLevelsText.Text = "K";
                     Sampling.Visibility = Visibility.Visible;
                     Sampling.Content = "Splot";
                     Quantization.Visibility = Visibility.Visible;
                     Quantization.Content = "Korelacja";
-                    Reconstruction.Visibility = Visibility.Hidden;
+                    Reconstruction.Visibility = Visibility.Visible;
+                    Reconstruction.Content = "Filtracja";
                     MseText.Visibility = Visibility.Hidden;
                     Mse.Visibility = Visibility.Hidden;
                     break;

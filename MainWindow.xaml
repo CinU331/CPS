@@ -52,7 +52,7 @@
             <TextBox Name="SamplingFrequency" Text ="512" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="457,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <TextBox Name="NumberOfCompartments" Text ="10" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="735,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50"/>
             <TextBox Name="Probability" Text ="0,5" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1123,225,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
-            <TextBox Name="NthSample" Text ="2" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1342,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
+            <TextBox Name="NthSample" Text ="25" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1342,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
             <TextBox Name="QuantizationLevels" Text ="8" FontSize="20" HorizontalAlignment="Left" Height="36" Margin="1342,224,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" RenderTransformOrigin="0.591,-0.625"/>
             <TextBox Name="Average" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="439,602,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75"/>
             <TextBox Name="AbsoluteMean" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Height="35" Margin="617,602,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="74"/>
