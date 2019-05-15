@@ -104,7 +104,8 @@
             <Button Name="SaveResult" Content="Zapisz" Click="SaveResult_Click" IsEnabled="False" FontSize="20" HorizontalAlignment="Left" Margin="1396,265,0,0" VerticalAlignment="Top" Width="76" Grid.Row="1"/>
             <ComboBox Name="Exercises" HorizontalAlignment="Left" Margin="781,12,0,0" VerticalAlignment="Top" Width="511" FontSize="25" SelectionChanged="Exercise_SelectionChanged">
                 <ComboBoxItem>Zadanie 1 - Generacja sygnału i szumu</ComboBoxItem>
-                <ComboBoxItem IsSelected="True">Zadanie 2 - Próbkowanie i kwantyzacja</ComboBoxItem>
+                <ComboBoxItem>Zadanie 2 - Próbkowanie i kwantyzacja</ComboBoxItem>
+                <ComboBoxItem IsSelected="True">Zadanie 3 - Splot, filtracja i korelacja sygnałów</ComboBoxItem>
             </ComboBox>
         </Grid>
     </ScrollViewer>

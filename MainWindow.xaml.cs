@@ -654,22 +654,82 @@ namespace CPS
         }
         private void Sample_Click(object sender, RoutedEventArgs e)
         {
-            if (firstPlotExist)
+            if (Sampling.Content.Equals("Próbkowanie"))
             {
-                if (NthSample.Text != "")
-                    nthSample = int.Parse(NthSample.Text);
-                GenerateSampledSignal(plot2, values1);
-                GenerateHistogram(histogram2, sampledValues);
-                CalculateParameters(sampledValues, 2);
+                if (firstPlotExist)
+                {
+                    if (NthSample.Text != "")
+                        nthSample = int.Parse(NthSample.Text);
+                    GenerateSampledSignal(plot2, values1);
+                    GenerateHistogram(histogram2, sampledValues);
+                    CalculateParameters(sampledValues, 2);
+                }
             }
+            else if (Sampling.Content.Equals("Splot"))
+            {
+                if (firstPlotExist && secondPlotExist)
+                {
+                    result = new List<KeyValuePair<double, double>>();
+                    int M = values1.Count;
+                    int N = values2.Count;
+                    int yCount = M + N - 1;
+                    double sum;
+                    double timeStep = (startTime + duration) / yCount;
+                    for (int n = 0; n < yCount; n++)
+                    {
+                        sum = 0;
+                        for (int k = 0; k < M; k++)
+                        {
+                            if (((n - k) >= 0) && ((n - k) < N))
+                                sum += values1[k].Value * values2[n - k].Value;
+                        }
+                        result.Insert(n, new KeyValuePair<double, double>(timeStep * n, sum));
+                    }
+                    GenerateResultPlot(resultPlot, result);
+                    GenerateHistogram(resultHistogram, result);
+                    CalculateParameters(result, 3);
+                    SaveResult.IsEnabled = true;
+                }
+            }
+
         }
         private void Quantization_Click(object sender, RoutedEventArgs e)
         {
-            if (QuantizationLevels.Text != "")
-                quantizationLevels = int.Parse(QuantizationLevels.Text);
-            GenerateQuantizedSignal(plot2, sampledValues);
-            GenerateHistogram(histogram2, quantizedValues);
-            CalculateParameters(quantizedValues, 2);
+            if (Quantization.Content.Equals("Kwantyzacja"))
+            {
+                if (QuantizationLevels.Text != "")
+                    quantizationLevels = int.Parse(QuantizationLevels.Text);
+                GenerateQuantizedSignal(plot2, sampledValues);
+                GenerateHistogram(histogram2, quantizedValues);
+                CalculateParameters(quantizedValues, 2);
+            }
+            else if (Quantization.Content.Equals("Korelacja"))
+            {
+                if (firstPlotExist && secondPlotExist)
+                {
+                    result = new List<KeyValuePair<double, double>>();
+                    int M = values1.Count;
+                    int N = values2.Count;
+                    int yCount = M + N - 1;
+                    int negIndex = -yCount + M;
+                    double sum;
+                    double timeStep = (startTime + duration) / yCount;
+                    for (int n = negIndex; n < yCount + negIndex; n++)
+                    {
+                        sum = 0;
+                        for (int k = 0; k < M; k++)
+                        {
+                            if (((k - n) >= 0) && ((k - n) < N))
+                                sum += values1[k].Value * values2[k - n].Value;
+                        }
+                        result.Insert(n - negIndex, new KeyValuePair<double, double>(timeStep * n, sum));
+                    }
+                    GenerateResultPlot(resultPlot, result);
+                    GenerateHistogram(resultHistogram, result);
+                    CalculateParameters(result, 3);
+                    SaveResult.IsEnabled = true;
+                }
+            }
         }
         private void Reconstruction_Click(object sender, RoutedEventArgs e)
         {
@@ -700,10 +760,25 @@ namespace CPS
                     QuantizationLevels.Visibility = Visibility.Visible;
                     QuantizationLevelsText.Visibility = Visibility.Visible;
                     Sampling.Visibility = Visibility.Visible;
+                    Sampling.Content = "Próbkowanie";
                     Quantization.Visibility = Visibility.Visible;
+                    Quantization.Content = "Kwantyzacja";
                     Reconstruction.Visibility = Visibility.Visible;
                     MseText.Visibility = Visibility.Visible;
                     Mse.Visibility = Visibility.Visible;
+                    break;
+                case 2:
+                    NthSample.Visibility = Visibility.Hidden;
+                    NthSampleText.Visibility = Visibility.Hidden;
+                    QuantizationLevels.Visibility = Visibility.Hidden;
+                    QuantizationLevelsText.Visibility = Visibility.Hidden;
+                    Sampling.Visibility = Visibility.Visible;
+                    Sampling.Content = "Splot";
+                    Quantization.Visibility = Visibility.Visible;
+                    Quantization.Content = "Korelacja";
+                    Reconstruction.Visibility = Visibility.Hidden;
+                    MseText.Visibility = Visibility.Hidden;
+                    Mse.Visibility = Visibility.Hidden;
                     break;
             }
         }
