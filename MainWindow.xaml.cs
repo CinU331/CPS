@@ -31,6 +31,7 @@ namespace CPS
         private int selectedTypeOfFilter;
         private int selectedTypeOfWindow;
         private int mCount;
+        private double velocity;
 
         private List<SignalAndNoise> SignalsAndNoises;
         private OxyPlotModel plot1;
@@ -874,9 +875,11 @@ namespace CPS
                 result.RemoveRange(0, result.Count / 2);
                 double keyOfMaxValue = result.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
                 double time = Math.Abs(keyOfMaxValue - result[result.Count / 2 + 1].Key);
-                //double velocity = 299792458; // prędkość światła
-                double velocity = 340; // prędkość dźwięku
-                double distance = time * velocity; // w m
+                if (Velocity.Text != "")
+                {
+                    velocity = double.Parse(Velocity.Text);
+                }
+                double distance = time * velocity;
                 distance /= 2;
                 Distance.Text = distance.ToString();
             }
@@ -901,6 +904,8 @@ namespace CPS
                     DistanceText.Visibility = Visibility.Hidden;
                     Distance.Visibility = Visibility.Hidden;
                     DistanceMeasurement.Visibility = Visibility.Hidden;
+                    Velocity.Visibility = Visibility.Hidden;
+                    VelocityText.Visibility = Visibility.Hidden;
                     changeSelect = true;
                     break;
                 case 1:
@@ -923,6 +928,8 @@ namespace CPS
                     DistanceText.Visibility = Visibility.Hidden;
                     Distance.Visibility = Visibility.Hidden;
                     DistanceMeasurement.Visibility = Visibility.Hidden;
+                    Velocity.Visibility = Visibility.Hidden;
+                    VelocityText.Visibility = Visibility.Hidden;
                     changeSelect = true;
                     break;
                 case 2:
@@ -947,6 +954,8 @@ namespace CPS
                         DistanceText.Visibility = Visibility.Visible;
                         Distance.Visibility = Visibility.Visible;
                         DistanceMeasurement.Visibility = Visibility.Visible;
+                        Velocity.Visibility = Visibility.Visible;
+                        VelocityText.Visibility = Visibility.Visible;
                     }
                     break;
             }
