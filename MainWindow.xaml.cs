@@ -30,6 +30,7 @@ namespace CPS
         private int quantizationLevels;
         private int selectedTypeOfFilter;
         private int selectedTypeOfWindow;
+        private int mCount;
 
         private List<SignalAndNoise> SignalsAndNoises;
         private OxyPlotModel plot1;
@@ -47,6 +48,7 @@ namespace CPS
         private List<KeyValuePair<double, double>> sampledValues;
         private List<KeyValuePair<double, double>> quantizedValues;
         private List<KeyValuePair<double, double>> reconstructedValues;
+        private List<KeyValuePair<double, double>> filteredValues;
         private double[] tmpForRand;
         private bool firstPlotExist;
         private bool secondPlotExist;
@@ -410,6 +412,92 @@ namespace CPS
             plot.PlotModel.Series.Add(seriesPoints);
             //plot.PlotModel.Series.Add(originalSignalPoints);
         }
+        private void Weave(List<KeyValuePair<double, double>> signal1, List<KeyValuePair<double, double>> signal2)
+        {
+            int M = signal1.Count;
+            int N = signal2.Count;
+            int yCount = M + N - 1;
+            double sum;
+            double signal1Duration = Math.Abs(signal1[signal1.Count - 1].Key - signal1[0].Key);
+            double signal2Duration = Math.Abs(signal2[signal2.Count - 1].Key - signal2[0].Key);
+            double timeStep = (signal1Duration + signal2Duration) / yCount;
+            for (int n = 0; n < yCount; n++)
+            {
+                sum = 0;
+                for (int k = 0; k < M; k++)
+                {
+                    if (((n - k) >= 0) && ((n - k) < N))
+                        sum += signal1[k].Value * signal2[n - k].Value;
+                }
+                result.Insert(n, new KeyValuePair<double, double>(timeStep * n, sum));
+            }
+        }
+        private void Correlation()
+        {
+            int M = values1.Count;
+            int N = values2.Count;
+            int yCount = M + N - 1;
+            int negIndex = -yCount + M;
+            double sum;
+            double timeStep = (startTime + duration) / yCount;
+            for (int n = negIndex; n < yCount + negIndex; n++)
+            {
+                sum = 0;
+                for (int k = 0; k < M; k++)
+                {
+                    if (((k - n) >= 0) && ((k - n) < N))
+                        sum += values1[k].Value * values2[k - n].Value;
+                }
+                result.Insert(n - negIndex, new KeyValuePair<double, double>(timeStep * n, sum));
+            }
+        }
+        private void Filtration()
+        {
+            int M, N = 256;
+            double K, up, down, tmp;
+            if (NthSample.Text != "")
+            {
+                M = int.Parse(NthSample.Text);
+                mCount = M;
+            }
+            else return;
+            if (QuantizationLevels.Text != "")
+                K = double.Parse(QuantizationLevels.Text);
+            else return;
+            for (int n = 0; n < M; n++)
+            {
+                if (n == (M - 1) / 2)
+                    filteredValues.Insert(n, new KeyValuePair<double, double>(n, 2 / K));
+                else
+                {
+                    up = Math.Sin((2 * Math.PI * (n - (M - 1) / 2)) / K);
+                    down = Math.PI * (n - (M - 1) / 2);
+                    filteredValues.Insert(n, new KeyValuePair<double, double>(n, up / down));
+                }
+            }
+            for (int i = M; i < N; i++)
+                filteredValues.Insert(i, new KeyValuePair<double, double>(i, 0));
+            if (selectedTypeOfWindow == 2)  //okno Hanninga, domyślnie okno prostokątne
+            {
+                for (int n = 0; n < N; n++)
+                {
+                    tmp = filteredValues[n].Value;
+                    tmp = tmp * (0.5 - 0.5 * Math.Cos((2 * Math.PI * n) / M));
+                    filteredValues.Insert(N + n, new KeyValuePair<double, double>(n, tmp));
+                }
+                filteredValues.RemoveRange(0, N);
+            }
+            if (selectedTypeOfFilter == 2)  //filtr górnoprzepustowy, domyślnie filtr dolnoprzepustowy
+            {
+                for (int n = 0; n < N; n++)
+                {
+                    tmp = filteredValues[n].Value;
+                    tmp = tmp * Math.Pow(-1, n);
+                    filteredValues.Insert(N + n, new KeyValuePair<double, double>(n, tmp));
+                }
+                filteredValues.RemoveRange(0, N);
+            }
+        }
         #endregion
         #region CalculateParameters
         private void CalculateParameters(List<KeyValuePair<double, double>> values, int plotId)
@@ -671,28 +759,13 @@ namespace CPS
                 if (firstPlotExist && secondPlotExist)
                 {
                     result = new List<KeyValuePair<double, double>>();
-                    int M = values1.Count;
-                    int N = values2.Count;
-                    int yCount = M + N - 1;
-                    double sum;
-                    double timeStep = (startTime + duration) / yCount;
-                    for (int n = 0; n < yCount; n++)
-                    {
-                        sum = 0;
-                        for (int k = 0; k < M; k++)
-                        {
-                            if (((n - k) >= 0) && ((n - k) < N))
-                                sum += values1[k].Value * values2[n - k].Value;
-                        }
-                        result.Insert(n, new KeyValuePair<double, double>(timeStep * n, sum));
-                    }
+                    Weave(values1, values2);
                     GenerateResultPlot(resultPlot, result);
                     GenerateHistogram(resultHistogram, result);
                     CalculateParameters(result, 3);
                     SaveResult.IsEnabled = true;
                 }
             }
-
         }
         private void Quantization_Click(object sender, RoutedEventArgs e)
         {
@@ -709,22 +782,11 @@ namespace CPS
                 if (firstPlotExist && secondPlotExist)
                 {
                     result = new List<KeyValuePair<double, double>>();
-                    int M = values1.Count;
-                    int N = values2.Count;
-                    int yCount = M + N - 1;
-                    int negIndex = -yCount + M;
-                    double sum;
-                    double timeStep = (startTime + duration) / yCount;
-                    for (int n = negIndex; n < yCount + negIndex; n++)
-                    {
-                        sum = 0;
-                        for (int k = 0; k < M; k++)
-                        {
-                            if (((k - n) >= 0) && ((k - n) < N))
-                                sum += values1[k].Value * values2[k - n].Value;
-                        }
-                        result.Insert(n - negIndex, new KeyValuePair<double, double>(timeStep * n, sum));
-                    }
+                    //Correlation();
+                    ///Korelacja z użyciem splotu:
+                    values2.Reverse();
+                    Weave(values1, values2);
+                    values2.Reverse();
                     GenerateResultPlot(resultPlot, result);
                     GenerateHistogram(resultHistogram, result);
                     CalculateParameters(result, 3);
@@ -741,54 +803,34 @@ namespace CPS
                 CalculateParameters(reconstructedValues, 2);
                 CalculateMeanSquaredError();
             }
-            else if (Reconstruction.Content.Equals("Filtracja"))
+            else if (Reconstruction.Content.Equals("Filtr"))
             {
-                int M, N = 256;
-                double K, up, down, tmp;
-                if (NthSample.Text != "")
-                    M = int.Parse(NthSample.Text);
-                else return;
-                if (QuantizationLevels.Text != "")
-                    K = double.Parse(QuantizationLevels.Text);
-                else return;
-                values2 = new List<KeyValuePair<double, double>>();
-                for (int n = 0; n < M; n++)
-                {
-                    if (n == (M - 1) / 2)
-                        values2.Insert(n, new KeyValuePair<double, double>(n, 2 / K));
-                    else
-                    {
-                        up = Math.Sin((2 * Math.PI * (n - (M - 1) / 2)) / K);
-                        down = Math.PI * (n - (M - 1) / 2);
-                        values2.Insert(n, new KeyValuePair<double, double>(n, up / down));
-                    }
-                }
-                for (int i = M; i < N; i++)
-                    values2.Insert(i, new KeyValuePair<double, double>(i, 0));
-                if (selectedTypeOfWindow == 2)  //okno Hanninga, domyślnie okno prostokątne
-                {
-                    for (int n = 0; n < N; n++)
-                    {
-                        tmp = values2[n].Value;
-                        tmp = tmp * (0.5 - 0.5 * Math.Cos((2 * Math.PI * n) / M));
-                        values2.Insert(N + n, new KeyValuePair<double, double>(n, tmp));
-                    }
-                    values2.RemoveRange(0, N);
-                }
-                if (selectedTypeOfFilter == 2)  //filtr górnoprzepustowy, domyślnie filtr dolnoprzepustowy
-                {
-                    for (int n = 0; n < N; n++)
-                    {
-                        tmp = values2[n].Value;
-                        tmp = tmp * Math.Pow(-1, n);
-                        values2.Insert(N + n, new KeyValuePair<double, double>(n, tmp));
-                    }
-                    values2.RemoveRange(0, N);
-                }
-                GenerateResultPlot(plot1, values2);
-                GenerateHistogram(histogram1, values2);
-                CalculateParameters(values2, 1);
+
+                filteredValues = new List<KeyValuePair<double, double>>();
+                Filtration();
+                GenerateResultPlot(plot1, filteredValues);
+                GenerateHistogram(histogram1, filteredValues);
+                CalculateParameters(filteredValues, 1);
+                Reconstruction.Content = "Filtracja";
             }
+            else
+            {
+                if (secondPlotExist)
+                {
+                    result = new List<KeyValuePair<double, double>>();
+                    int tmp = filteredValues.Count;
+                    for (int i = 0; i < tmp; i++)
+                        filteredValues.Add(new KeyValuePair<double, double>(0, filteredValues[i].Value));
+                    filteredValues.RemoveRange(0, filteredValues.Count / 2);
+                    filteredValues.RemoveRange(mCount, filteredValues.Count - mCount);
+                    Weave(values2, filteredValues);
+                    GenerateResultPlot(resultPlot, result);
+                    GenerateHistogram(resultHistogram, result);
+                    CalculateParameters(result, 3);
+                    Reconstruction.Content = "Filtr";
+                }
+            }
+
         }
         private void TypesOfFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -816,6 +858,29 @@ namespace CPS
                     break;
             }
         }
+        private void DistanceMeasurement_Click(object sender, RoutedEventArgs e)
+        {
+            if (firstPlotExist && secondPlotExist)
+            {
+                result = new List<KeyValuePair<double, double>>();
+                //Correlation();
+                values2.Reverse();
+                Weave(values1, values2);
+                values2.Reverse();
+                GenerateResultPlot(resultPlot, result);
+                GenerateHistogram(resultHistogram, result);
+                CalculateParameters(result, 3);
+                SaveResult.IsEnabled = true;
+                result.RemoveRange(0, result.Count / 2);
+                double keyOfMaxValue = result.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+                double time = Math.Abs(keyOfMaxValue - result[result.Count / 2 + 1].Key);
+                //double velocity = 299792458; // prędkość światła
+                double velocity = 340; // prędkość dźwięku
+                double distance = time * velocity; // w m
+                distance /= 2;
+                Distance.Text = distance.ToString();
+            }
+        }
         private void Exercise_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             selectedExercise = Exercises.SelectedIndex;
@@ -833,6 +898,9 @@ namespace CPS
                     Mse.Visibility = Visibility.Hidden;
                     TypesOfWindow.Visibility = Visibility.Hidden;
                     TypesOfFilter.Visibility = Visibility.Hidden;
+                    DistanceText.Visibility = Visibility.Hidden;
+                    Distance.Visibility = Visibility.Hidden;
+                    DistanceMeasurement.Visibility = Visibility.Hidden;
                     changeSelect = true;
                     break;
                 case 1:
@@ -852,6 +920,9 @@ namespace CPS
                     Mse.Visibility = Visibility.Visible;
                     TypesOfWindow.Visibility = Visibility.Hidden;
                     TypesOfFilter.Visibility = Visibility.Hidden;
+                    DistanceText.Visibility = Visibility.Hidden;
+                    Distance.Visibility = Visibility.Hidden;
+                    DistanceMeasurement.Visibility = Visibility.Hidden;
                     changeSelect = true;
                     break;
                 case 2:
@@ -866,13 +937,16 @@ namespace CPS
                     Quantization.Visibility = Visibility.Visible;
                     Quantization.Content = "Korelacja";
                     Reconstruction.Visibility = Visibility.Visible;
-                    Reconstruction.Content = "Filtracja";
+                    Reconstruction.Content = "Filtr";
                     MseText.Visibility = Visibility.Hidden;
                     Mse.Visibility = Visibility.Hidden;
                     if (changeSelect)
                     {
                         TypesOfWindow.Visibility = Visibility.Visible;
                         TypesOfFilter.Visibility = Visibility.Visible;
+                        DistanceText.Visibility = Visibility.Visible;
+                        Distance.Visibility = Visibility.Visible;
+                        DistanceMeasurement.Visibility = Visibility.Visible;
                     }
                     break;
             }
