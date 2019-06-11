@@ -105,7 +105,8 @@
             <ComboBox Name="Exercises" HorizontalAlignment="Left" Margin="735,10,0,0" VerticalAlignment="Top" Width="555" FontSize="25" SelectionChanged="Exercise_SelectionChanged">
                 <ComboBoxItem>Zadanie 1 - Generacja sygnału i szumu</ComboBoxItem>
                 <ComboBoxItem>Zadanie 2 - Próbkowanie i kwantyzacja</ComboBoxItem>
-                <ComboBoxItem IsSelected="True">Zadanie 3 - Splot, filtracja i korelacja sygnałów</ComboBoxItem>
+                <ComboBoxItem>Zadanie 3 - Splot, filtracja i korelacja sygnałów</ComboBoxItem>
+                <ComboBoxItem IsSelected="True">Zadanie 4 - Przekształcenie Fouriera, kosinusowe, szybkie algorytmy</ComboBoxItem>
             </ComboBox>
             <ComboBox Name="TypesOfFilter" HorizontalAlignment="Left" Margin="1342,142,0,0" VerticalAlignment="Top" Width="162" FontSize="15" SelectionChanged="TypesOfFilter_SelectionChanged" Height="25">
                 <ComboBoxItem IsSelected="True">Filtr dolnoprzepustowy</ComboBoxItem>

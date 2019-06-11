@@ -67,6 +67,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ComplexNumber.cs" />
+    <Compile Include="Fourier.cs" />
     <Compile Include="Histogram.cs" />
     <Compile Include="OxyPlotModel.cs" />
     <Compile Include="SignalAndNoise.cs" />
