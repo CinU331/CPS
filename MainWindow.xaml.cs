@@ -201,7 +201,7 @@ namespace CPS
 
             if (selectedId == 1 || selectedId == 2)
             {
-                for (double i = startTime; i <= endTime; i += timeBetweenSamples)
+                for (double i = startTime; i < endTime; i += timeBetweenSamples)
                 {
                     yValue = (double)method.Invoke(this, new object[] { random, -amplitude, amplitude });
                     originalSignalPoints.Points.Add(new DataPoint(i, yValue));
@@ -212,7 +212,7 @@ namespace CPS
             else if (selectedId >= 3 && selectedId <= 5)
             {
                 int n = 1;
-                for (double i = startTime; i <= endTime; i += timeBetweenSamples, n++)
+                for (double i = startTime; i < endTime; i += timeBetweenSamples, n++)
                 {
                     yValue = (double)method.Invoke(this, new object[] { n });
                     originalSignalPoints.Points.Add(new DataPoint(i, yValue));
@@ -224,7 +224,7 @@ namespace CPS
             {
                 double k = 0;
                 int n = 1, tmp = 1;
-                for (double i = startTime; i <= endTime; i += timeBetweenSamples, n++)
+                for (double i = startTime; i < endTime; i += timeBetweenSamples, n++)
                 {
                     yValue = (double)method.Invoke(this, new object[] { n, k });
                     originalSignalPoints.Points.Add(new DataPoint(i, yValue));
@@ -239,7 +239,7 @@ namespace CPS
             }
             else if (selectedId == 9)
             {
-                for (double i = startTime; i <= endTime; i += timeBetweenSamples)
+                for (double i = startTime; i < endTime; i += timeBetweenSamples)
                 {
                     yValue = (double)method.Invoke(this, new object[] { i });
                     originalSignalPoints.Points.Add(new DataPoint(i, yValue));
@@ -250,7 +250,7 @@ namespace CPS
             else if (selectedId == 10)
             {
                 scatterSeries = new ScatterSeries() { MarkerSize = 2 };
-                for (double i = startTime; i <= endTime; i += timeBetweenSamples)
+                for (double i = startTime; i < endTime; i += timeBetweenSamples)
                 {
                     yValue = (double)method.Invoke(this, new object[] { i });
                     scatterSeries.Points.Add(new DataPoint(i, yValue));
@@ -270,7 +270,7 @@ namespace CPS
                         tmpForRand[i] = 0;
                 }
                 scatterSeries = new ScatterSeries() { MarkerSize = 2 };
-                for (double i = startTime; i <= endTime; i += timeBetweenSamples)
+                for (double i = startTime; i < endTime; i += timeBetweenSamples)
                 {
                     yValue = (double)method.Invoke(this, new object[] { random });
                     scatterSeries.Points.Add(new DataPoint(i, yValue));
@@ -767,6 +767,19 @@ namespace CPS
                     SaveResult.IsEnabled = true;
                 }
             }
+            else if (Sampling.Content.Equals("DIT FFT"))
+            {
+                ComplexNumber[] complexNumbers = Utilities.ConvertRealToComplex(result);
+                complexNumbers = Fourier.DIT_FFT(complexNumbers);
+                values1 = Utilities.ConvertComplexTableToKeyValuePair(complexNumbers, result, true);
+                GenerateResultPlot(plot1, values1);
+                GenerateHistogram(histogram1, values1);
+                CalculateParameters(values1, 1);
+                values2 = Utilities.ConvertComplexTableToKeyValuePair(complexNumbers, result, false);
+                GenerateResultPlot(plot2, values2);
+                GenerateHistogram(histogram2, values2);
+                CalculateParameters(values2, 2);
+            }
         }
         private void Quantization_Click(object sender, RoutedEventArgs e)
         {
@@ -793,6 +806,19 @@ namespace CPS
                     CalculateParameters(result, 3);
                     SaveResult.IsEnabled = true;
                 }
+            }
+            else if (Quantization.Content.Equals("DIF FFT"))
+            {
+                ComplexNumber[] complexNumbers = Utilities.ConvertRealToComplex(result);
+                complexNumbers = Fourier.DIF_FFT(complexNumbers);
+                values1 = Utilities.ConvertComplexTableToKeyValuePair(complexNumbers, result, true);
+                GenerateResultPlot(plot1, values1);
+                GenerateHistogram(histogram1, values1);
+                CalculateParameters(values1, 1);
+                values2 = Utilities.ConvertComplexTableToKeyValuePair(complexNumbers, result, false);
+                GenerateResultPlot(plot2, values2);
+                GenerateHistogram(histogram2, values2);
+                CalculateParameters(values2, 2);
             }
         }
         private void Reconstruction_Click(object sender, RoutedEventArgs e)
@@ -957,6 +983,29 @@ namespace CPS
                         Velocity.Visibility = Visibility.Visible;
                         VelocityText.Visibility = Visibility.Visible;
                     }
+
+                    break;
+                case 3:
+                    NthSample.Visibility = Visibility.Hidden;
+                    NthSampleText.Visibility = Visibility.Hidden;
+                    QuantizationLevels.Visibility = Visibility.Hidden;
+                    QuantizationLevelsText.Visibility = Visibility.Hidden;
+                    Sampling.Visibility = Visibility.Visible;
+                    Sampling.Content = "DIT FFT";
+                    Quantization.Visibility = Visibility.Visible;
+                    Quantization.Content = "DIF FFT";
+                    Reconstruction.Visibility = Visibility.Visible;
+                    Reconstruction.Content = "FCT II";
+                    MseText.Visibility = Visibility.Hidden;
+                    Mse.Visibility = Visibility.Hidden;
+                    TypesOfWindow.Visibility = Visibility.Hidden;
+                    TypesOfFilter.Visibility = Visibility.Hidden;
+                    DistanceText.Visibility = Visibility.Hidden;
+                    Distance.Visibility = Visibility.Hidden;
+                    DistanceMeasurement.Visibility = Visibility.Hidden;
+                    Velocity.Visibility = Visibility.Hidden;
+                    VelocityText.Visibility = Visibility.Hidden;
+                    changeSelect = true;
                     break;
             }
         }

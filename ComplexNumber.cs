@@ -4,15 +4,14 @@ namespace CPS
 {
     class ComplexNumber
     {
-        private double realPart;
-        private double imaginaryPart;
-
-        public ComplexNumber(){}
+        public double RealPart { get; set; }
+        public double ImaginaryPart { get; set; }
+        public ComplexNumber() { }
 
         public ComplexNumber(double realPart, double imaginaryPart)
         {
-            this.realPart = realPart;
-            this.imaginaryPart = imaginaryPart;
+            this.RealPart = realPart;
+            this.ImaginaryPart = imaginaryPart;
         }
 
         public static ComplexNumber ConvertFromPolarToRectangular(double r, double radians)
@@ -23,35 +22,19 @@ namespace CPS
 
         public static ComplexNumber operator +(ComplexNumber x, ComplexNumber y)
         {
-            ComplexNumber data = new ComplexNumber(x.realPart + y.realPart, x.imaginaryPart + y.imaginaryPart);
+            ComplexNumber data = new ComplexNumber(x.RealPart + y.RealPart, x.ImaginaryPart + y.ImaginaryPart);
             return data;
         }
         public static ComplexNumber operator -(ComplexNumber x, ComplexNumber y)
         {
-            ComplexNumber data = new ComplexNumber(x.realPart - y.realPart, x.imaginaryPart - y.imaginaryPart);
+            ComplexNumber data = new ComplexNumber(x.RealPart - y.RealPart, x.ImaginaryPart - y.ImaginaryPart);
             return data;
         }
         public static ComplexNumber operator *(ComplexNumber x, ComplexNumber y)
         {
-            ComplexNumber data = new ComplexNumber((x.realPart * y.realPart) - (x.imaginaryPart * y.imaginaryPart),
-                (x.realPart * y.imaginaryPart + (x.imaginaryPart + y.realPart)));
+            ComplexNumber data = new ComplexNumber((x.RealPart * y.RealPart) - (x.ImaginaryPart * y.ImaginaryPart),
+                (x.RealPart * y.ImaginaryPart + (x.ImaginaryPart + y.RealPart)));
             return data;
-        }
-
-        public double Magnitude
-        {
-            get
-            {
-                return Math.Sqrt(Math.Pow(realPart, 2) + Math.Pow(imaginaryPart, 2));
-            }
-        }
-
-        public double Phase
-        {
-            get
-            {
-                return Math.Atan(imaginaryPart / realPart);
-            }
         }
     }
 }
